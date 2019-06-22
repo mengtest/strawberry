@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+    <h1 id="title">{{message}}</h1>
+	<div>
+		<label>user:</label>
+    	<select id="users" onchange="sendData">
+            {% for _, user in ipairs(users) do %}
+                <option name="{{ user.uaccount }}">{{ user.uaccount }}</option>
+            {% end %}
+    	</select>
+        <table id="tt">
+            
+        </table>
+    	<label>csv_id:</label>
+    	<input id="txt1" type="text" />
+    	<label>num:</label>
+    	<input id="txt2" type="text" />
+    	<label>datetime:</label>
+    	<input id="date1" type="date" value="2011-01-04" />
+    	<input id="btn1" type="button" value="send" />	
+	</div>
+	
+    <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script type="text/javascript">
+    	$(document).ready(function(){
+    		$('#btn1').click(function(){
+                debugger
+    			var uaccount = $("#users").val();
+    			var csv_id = $("#txt1").val();
+    			var num = $("#txt2").val();
+    			var data = {
+                    uaccount:uaccount,
+                    csv_id:csv_id,
+                    num:num,
+                };
+    			$.ajax({
+    				url:"/props",
+    				type:"POST",
+    				data:data,
+                    dataType:"json",
+    				success:function(resp){
+                        $(".txt1").val("");
+                        $(".txt2").val("");
+                        $("#title").html(resp.msg);
+    				},
+    				error:function(){
+    					alert('error');
+    				}
+    			});
+    		});
+            $("#users").change(function () {
+                var uaccount = $("#users").val()
+                var data = {
+                    cmd : "user",
+                    uaccount : uaccount,
+                };
+                $.ajax({
+                    url:"/equipments",
+                    type:"POST",
+                    data:data,
+                    dataType:"json",
+                    success:function(resp){
+                        if (resp.errorcode == 0) {
+                            var achievements = resp.achievements;
+                            for (var i = achievements.length - 1; i >= 0; i--) {
+                                var it = Iterator(achievements[i])
+                                for (var pair in it) {
+                                    var r = pair[1]
+                                    var $tr = $("<tr>nn</tr>")
+                                    $("#tt").append($tr)
+                                }
+                            };
+                        }
+                        $("#title").html(resp.msg);
+                    },
+                    error:function(){
+                        alert('error');
+                    }
+                });
+            });
+    	});
+    </script>
+</body>
+</html>

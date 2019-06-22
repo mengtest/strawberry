@@ -1,0 +1,83 @@
+####################################### 
+# 一般模块 [1, 100)
+handshake 1 {
+    response {
+    	errorcode 0 : integer
+    }
+}
+
+logout 2 {
+    response {
+        errorcode 0 : integer
+    }
+}
+
+enter 3 {
+    response {
+        errorcode 0 : integer
+    }
+}
+
+
+####################################### 
+# 系统模块 [100, 500)
+# 第一条消息，主要是一个写个人信息
+modify_name 100 {
+    request {
+        nickname  0 : string
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+####################################### 
+# 邮件模块 [300, 350)
+fetchinbox 300 {
+    request {
+        fromdate  0 : integer
+    }
+    response {
+        errorcode 0 : integer
+        list      1 : *mail
+    }
+}
+
+syncsysmail 301 {
+    request {
+        all       0 : *integer
+    }
+    response {
+        errorcode 0 : integer
+        inbox     1 : *mail
+    }
+}
+
+viewedmail 302 {
+    request {
+        mailid    0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+####################################### 
+# 签到模块 [350, 400)
+checkindaily 350 {
+    response {
+        errorcode 0 : integer
+    }
+}
+
+####################################### 
+# 记录模块 [400, 450)
+record 400 {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+        r         1 : string
+    }
+}

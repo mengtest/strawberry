@@ -1,0 +1,116 @@
+####################################### 
+# 大佬2协议 [600, 700)
+
+#大佬2决定
+big2call 600 {
+    request {
+        idx       0 : integer
+        opcode    1 : integer
+        lead      2 : big2lead
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+# 大佬2出牌 (deprecated)
+# big2lead 601 {
+#     request {
+#         idx        0 : integer
+#         lead      2 : big2lead
+#     } 
+#     response {
+#         errorcode 0 : integer
+#     }
+# }
+
+# 确认四个玩家都呈现完毕后，状态转移
+big2step 602 {
+    request {
+        idx       0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+big2restart 603 {
+    request {
+        idx       0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+big2ready 604 {
+    request {
+        idx 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+        idx 1 : integer
+    }
+}
+
+big2match 605 {
+    request {
+        rule 0 : integer
+        mode 1 : integer
+        scene 2 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+big2create 606 {
+    request {
+        provice    0 : integer
+        ju         1 : integer
+    }
+    response {
+        errorcode 0 : integer
+        roomid    1 : integer
+        room_max  2 : integer
+    }
+}
+
+big2join 607 {
+    request {
+        roomid 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+        roomid    1 : integer
+        room_max  2 : integer
+        state     3 : string
+        rule      4 : big2rule
+        me        5 : big2player
+        ps        6 : *big2player
+    }
+}
+
+big2rejoin 608 {
+    response {
+        errorcode 0 : integer
+        roomid    1 : integer
+        room_max  2 : integer
+        state     3 : string
+        rule      4 : big2rule
+        me        5 : big2player
+        ps        6 : *big2player
+    }
+}
+
+big2leave 609 {
+    request {
+        idx 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+# 大佬2协议结束
+####################################### 

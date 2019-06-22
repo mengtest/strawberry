@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+    <h1>{{message}}</h1>
+	<div>
+        <div>
+    		<label>send_type:</label>
+        	<select id="select_send_type">
+        		<option name='all' value="2">all</option>
+        		<option name='group' value="1">group</option>
+        	</select>
+        </div>
+        <div>
+            <label>type:</label>
+            <select id="select_type">
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>    
+        </div>
+        <div>
+            <label>title:</label>
+            <input id="title" class= 'txt1' type="text" />    
+        </div>
+    	<div>
+            <label>content:</label>
+            <input id="content" class= 'txt1' type="text" />    
+        </div>
+    	<div>
+            <label>item1:</label>
+            <input id="itemsn1" class= 'txt2' type="text" />
+            <input id="itemnum1" class= 'txt2' type="text" />
+            <label>item2:</label>
+            <input id="itemsn2" class= 'txt2' type="text" />
+            <input id="itemnum2" class= 'txt2' type="text" />
+            <label>item3:</label>
+            <input id="itemsn3" class= 'txt2' type="text" />
+            <input id="itemnum3" class= 'txt2' type="text" />    
+        </div>
+        <div>
+            <label>iconid:</label>
+            <input id="iconid" class= 'txt2' type="text" />    
+        </div>
+        <div>
+            <label>sender:</label>
+            <input id="sender" type="text" />
+            <label>receiver:</label>
+            <input id="receiver" type="text" />    
+        </div>
+        <div>
+            <label>datetime:</label>
+            <input id="date1" type="date" value="2011-01-04" />    
+            <input class='btn' type="button" value="send" />    
+        </div>
+	</div>
+    <div>
+        <h1>Output:</h1>
+        <p id="msg">messge</p>    
+    </div>
+    <dev>
+    	<form method = "POST" action = "/email" enctype = "multipart/form-data">
+	    <label>upload</label>
+	    <input type = "file" name = "upload" />
+	    <input type = "submit" value = "submit" />
+	</form>
+    <dev>
+    <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script type="text/javascript">
+    	$(document).ready(function(){
+    		$('.btn').click(function(){
+    			var send_type = $("#select_send_type").val() || "";
+                var type = $("#select_type").val();
+                var title = $("#title").val();
+                var content = $("#content").val();
+                var itemsn1 = $("#itemsn1").val();
+                if (typeof(itemsn1) == "string") { itemsn1 = parseInt(itemsn1)} else if (typeof(itemsn1) != "number") { alert("itemsn1 must be number")};
+                var itemnum1 = $("#itemnum1").val();
+                if (typeof(itemnum1)) { itemnum1 = parseInt(itemnum1)} else if (typeof(itemnum1) != "number") { alert("itemnum1 must be number")};
+                var itemsn2 = $("#itemsn2").val();
+                if (typeof(itemsn2) == "string") { itemsn2 = parseInt(itemsn2)} else if (typeof(itemsn2) != "number") { alert("itemsn2 must be number")};
+                var itemnum2 = $("#itemnum2").val();
+                if (typeof(itemnum2) == "string") { itemnum2 = parseInt(itemnum2)} else if (typeof(itemsn2) != "number") { alert("itemsn2 must be number")};
+                var itemsn3 = $("#itemsn3").val();
+                if (typeof(itemsn3) == "string") { itemsn3 = parseInt(itemsn3)} else if (typeof(itemsn3) != "number") { alert("itemsn3 must be number")};
+                var itemnum3 = $("#itemnum3").val();
+                if (typeof(itemnum3) == "string") { itemnum3 = parseInt(itemnum3)} else if (typeof(itemnum3) != "number") { alert("itemnum3 must be number")};
+                var iconid = $("#iconid").val()
+                if (typeof(iconid) == "string") { iconid = parseInt(iconid)} else if (typeof(iconid) != "number") { alert("iconid must be number")};
+                var date1 = $("#date1").val();
+                var sender = $("#sender").val();
+                if (typeof(sender) == "string") { sender = parseInt(sender)} else if (typeof(sender) != "number") { alert("sender must be number")};
+                var receiver = $("#receiver").val();
+                if (typeof(receiver) == "string") { receiver = parseInt(receiver)} else if (typeof(receiver) != "number") { alert("receiver must be number")};
+    			var data = {
+                    send_type:send_type,
+                    type:type,
+                    title:title,
+                    content:content,
+                    itemsn1:itemsn1,
+                    itemnum1:itemnum1,
+                    itemsn2:itemsn2,
+                    itemnum2:itemnum2,
+                    itemsn3:itemsn3,
+                    itemnum3:itemnum3,
+                    iconid:iconid,
+                    date1:date1,
+                    sender:sender,
+                    receiver:receiver,
+                };
+    			$.ajax({
+    				url:"/email",
+    				type:"POST",
+    				data:data,
+                    dataType:"json",
+    				success:function(resp){
+                        // $(".txt1").val("");
+                        // $(".txt2").val("");
+                        $("#msg").html(resp.msg);
+    				},
+    				error:function(){
+    					alert('error');
+    				}
+    			});
+    		});
+            // $("#select_send_type").bind("change", function () {
+            //     // body...
+            //     alert("abcefe")
+            // });
+            // $("#select_type").bind("change", function () {
+            //     // body...
+            //     alert("change");
+            // });
+    	});
+    </script>
+</body>
+</html>

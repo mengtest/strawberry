@@ -1,0 +1,10 @@
+####################################### 
+# 球球模块 [10000, 10100)
+opcode 10000 {
+    request {
+        opcode 0 : op
+    }
+    response {
+    	errorcode 0 : integer
+    }
+}

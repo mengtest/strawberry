@@ -1,0 +1,112 @@
+####################################### 
+# 德州协议 [720, 800)
+
+# 请求
+pokercall 720 {
+    request {
+        idx       0 : integer
+        opcode    1 : integer
+        coin      2 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+# 确认四个玩家都呈现完毕后，状态转移
+pokerstep 721 {
+    request {
+        idx       0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+pokerrestart 722 {
+    request {
+        idx       0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+pokerready 723 {
+    request {
+        idx 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+        idx 1 : integer
+    }
+}
+
+pokermatch 724 {
+    request {
+        mode 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+pokercreate 725 {
+    request {
+        provice    0 : integer
+        ju         1 : integer
+    }
+    response {
+        errorcode 0 : integer
+        roomid    1 : integer
+        room_max  2 : integer
+    }
+}
+
+pokerjoin 726 {
+    request {
+        roomid 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+        roomid    1 : integer
+        mode      2 : integer          # 房间模式
+        state     3 : string           # 房间状态，这里其实没有用
+        rule      4 : pokerrule        # 在自定义有用,作为模式的补充
+        me        5 : pokerplayer
+        ps        6 : *pokerplayer
+    }
+}
+
+pokerrejoin 727 {
+    response {
+        errorcode 0 : integer
+        roomid    1 : integer
+        mode      2 : integer
+        state     3 : string
+        rule      4 : pokerrule
+        me        5 : pokerplayer
+        ps        6 : *pokerplayer
+    }
+}
+
+pokerleave 728 {
+    request {
+        idx 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+pokerjoined 729 {
+    request {
+        idx 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }   
+}
+
+# 德州协议 [720, 800)
+####################################### 

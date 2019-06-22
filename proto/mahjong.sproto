@@ -1,0 +1,83 @@
+####################################### 
+# 麻将玩家信息，在重新链接的时候
+.player {
+    idx          0 : integer
+    chip         1 : integer
+    sex          3 : integer
+    name         4 : string
+    state        5 : integer
+    last_state   6 : integer
+    que          7 : integer
+    takecardsidx 8 : integer
+    takecardscnt 9 : integer
+    takecardslen 10 : integer
+    takecards    11 : *card
+    cards        12 : *card
+    leadcards    13 : *card
+    putcards     14 : *card
+    putidx       15 : integer  # 无用
+    hold_card    16 : card
+    hucards      17 : *card
+    online       18 : boolean
+}
+
+.huinfo {
+    idx        0 : integer
+    card       1 : integer
+    dian       2 : integer
+    hutype     3 : integer
+    jiaotype   4 : integer
+}
+
+.opinfo {
+    idx        0 : integer      # 谁有操作
+    opcode     1 : integer      # 什么操作
+    card       2 : integer      # 针对那张牌
+    dian       3 : integer      # 谁打的，可能自摸
+    gangtype   4 : integer
+    hutype     5 : integer      # 如果是胡，请判断下
+    jiaotype   6 : integer      # 如果是胡，请判断下
+}
+
+.crsc {
+    hujiaozhuanyi 0 : integer
+    zimo          1 : integer
+    dianganghua   2 : integer
+    daiyaojiu     3 : integer
+    duanyaojiu    4 : integer
+    jiangdui      5 : integer
+    tiandihu      6 : integer
+    top           7 : integer
+}
+
+.crsx {
+    huqidui       0 : integer
+    qingyise      1 : integer
+}
+
+.rule {
+    id 0 : integer
+}
+
+.settlementitem {
+    idx       0 : integer           # 关于谁的
+    chip      1 : integer           # 赢与输，多少
+    opcode    2 : integer           # 什么原因，若是胡，请还要判断小面两个
+    gangtype  3 : integer
+    hutype    4 : integer           
+    jiaotype  5 : integer
+    them      6 : *integer          # 针对谁
+    huazhu    7 : boolean           # 是否是花猪
+    dajiao    8 : boolean           # 是否是大叫
+    tuisui    9 : boolean           # 是否是退税
+}
+
+.settle {
+    p1 0 : settlementitem
+    p2 1 : settlementitem
+    p3 2 : settlementitem
+    p4 3 : settlementitem
+}
+
+# 麻将
+#######################################

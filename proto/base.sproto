@@ -1,0 +1,42 @@
+.package {
+	type 0 : integer
+	session 1 : integer
+    index 2 : integer
+    version 3 : integer
+}
+
+.card {
+    pos   0 : integer
+    value 1 : integer
+}
+
+# 背包
+.item {
+    id  0 : integer
+    num 1 : integer
+}
+
+####################################### 
+# 邮件
+.mail {
+    id       0 : integer
+    from     1 : integer
+    to       2 : integer
+    title    3 : string
+    content  4 : string
+    viewed   5 : integer
+    datetime 6 : integer
+}
+
+.outbox {
+    all 0 : *mail
+}
+
+.record {
+    id            0 : integer
+    datetime      1 : integer
+    player1       2 : string
+    player2       3 : string
+    player3       4 : string
+    player4       5 : string
+}

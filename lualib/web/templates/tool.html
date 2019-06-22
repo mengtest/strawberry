@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+    	<title>TOOL</title>
+	</head>
+	<body>
+		<div id="container" style="width:100%; height:400px;"></div>
+        <h1>{{message}}</h1>
+        <div>
+            <input id="mtext" type="text"/>
+            <input id="valid" type="submit" value="submit" />    
+        </div>
+        <div>
+            <input id="mmtext" type="text"/>
+            <input id="input1" type="submit" value="abc">
+        </div>
+        <div>
+            <input id="mmtext1" type="text"/>
+            <input id="input2" type="submit" value="procedure">
+        </div>
+		<p id="msg"></p>
+		<div id="content"></div>
+
+		<script type="text/javascript" src="http://code.highcharts.com/highcharts.js"></script>
+		<script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
+        <script type="text/javascript">
+            $(function () { 
+                // $('#container').highcharts({
+                //     chart: { type: 'bar' },
+                //     title: { text: 'Fruit Consumption' },
+                //     xAxis: { categories: ['Apples', 'Bananas', 'Oranges'] },
+                //     yAxis: { title: { text: 'Fruit eaten' } },
+                //     series: [{ name:'Jane', data:[1, 0, 4]}, { name:'John', data:[5, 7, 3]}]
+                // });
+            });
+            $(document).ready(function() {
+                $("#valid").click(function() {
+                    var table_name = $("#mtext").val() || "";
+                    $.ajax({
+                        url:"/validation",
+                        type:"POST",
+                        data:{ table_name:table_name},
+                        dataType:"json",
+                        success:function(resp) {
+                            $("#msg").html(resp.msg);
+                        },
+                        error:function() {
+                            alert("error");
+                        }
+                    })
+                });
+                $("#input1").click(function () {
+                    // body...
+                    debugger
+                    var table_name = $("#mmtext").val() || "";
+                    $.ajax({
+                        url:"/validation_ro",
+                        type:"POST",
+                        data:{ table_name:table_name},
+                        dataType:"json",
+                        success:function (resp) {
+                            // body...
+                            $("#msg").html(resp.msg);
+                        },
+                        error:function () {
+                            // body...
+                            alert("error");
+                        }
+                    });
+                });
+                $("#input2").click(function () {
+                    // body...
+                    var table_name = $("#mmtext").val() || "";
+                    debugger
+                    $.ajax({
+                        url:"/percudure",
+                        type:"POST",
+                        data:{ table_name:table_name},
+                        dataType:"json",
+                        success:function (resp) {
+                            // body...
+                            $("#msg").html(resp.msg);
+                        },
+                        error:function () {
+                            // body...
+                            alert("error");
+                        }
+                    });
+                });
+            });
+        </script>
+	</body>
+</html>

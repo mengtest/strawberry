@@ -1,0 +1,157 @@
+
+####################################### 
+# 麻将协议 [500, 600)
+
+call 501 {
+    request {
+        op        0 : opinfo
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+# shuffle 502 {
+#     request {
+#         idx       0 : integer
+#     }
+#     response {
+#         errorcode 0 : integer
+#     }
+# }
+
+# dice 503 {
+#     request {
+#         idx       0 : integer
+#     }
+#     response {
+#         errorcode 0 : integer
+#         d1        1 : integer
+#         d2        2 : integer
+#     }
+# }
+
+lead 504 {
+    request {
+        idx       0 : integer
+        card      1 : integer
+        isHoldcard 2 : boolean
+    } 
+    response {
+        errorcode 0 : integer
+    }
+}
+
+step 505 {
+    request {
+        idx       0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+restart 506 {
+    request {
+        idx       0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+# rchat 507 {
+#     request {
+#         idx       0 : integer
+#         type      1 : integer
+#         textid    2 : integer
+#         sdsteam   3 : string
+#     }
+#     response {
+#         errorcode 0 : integer
+#     }
+# }
+
+xuanpao 508 {
+    request {
+        idx       0 : integer
+        fen       1 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+xuanque 509 {
+    request {
+        idx       0 : integer
+        que        1 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+ready 510 {
+    request {
+        idx 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+        idx 1 : integer
+    }
+}
+
+create 511 {
+    request {
+        provice    0 : integer
+        ju         1 : integer
+        overtype   2 : integer
+        sc         3 : crsc
+        sx         4 : crsx
+    }
+    response {
+        errorcode 0 : integer
+        roomid    1 : integer
+        room_max  2 : integer
+    }
+}
+
+join 512 {
+    request {
+        roomid 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+        roomid    1 : integer
+        room_max  2 : integer
+        me        3 : player
+        rule      4 : rule
+        ps        5 : *player
+        state     6 : integer
+    }
+}
+
+rejoin 513 {
+    response {
+        errorcode 0 : integer
+        roomid    1 : integer
+        room_max  2 : integer
+        me        3 : player
+        rule      4 : rule
+        ps        5 : *player
+        state     6 : integer
+    }
+}
+
+leave 514 {
+    request {
+        idx 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+# 麻将协议
+####################################### 

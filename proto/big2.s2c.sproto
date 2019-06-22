@@ -1,0 +1,163 @@
+####################################### 
+# 大老二模块 [600, 700)
+# 轮到你做出选择，是出牌还是放弃
+big2take_turn 600 {
+    request {
+        idx       0 : integer
+        countdown 1 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+# 
+big2call 601 {
+    request {
+        idx        0 : integer
+        opcode     1 : integer
+        lead       2 : big2lead
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+# 洗牌
+big2shuffle 602 {
+    request {
+        first     0 : integer
+        p1        1 : *integer
+        p2        2 : *integer
+        p3        3 : *integer
+        p4        4 : *integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+# (deprecated)
+# big2lead 603 {
+#     request {
+#         idx       0 : integer
+#         leadtype   1 : integer
+#         cards      2 : *card
+#     } 
+#     response {
+#         errorcode 0 : integer
+#     }
+# }
+
+# 发牌
+big2deal 604 {
+    request {
+        firstidx  0 : integer
+        firsttake 1 : integer
+        deal      2 : *big2playerdeal
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+big2ready 605 {
+    request {
+        idx 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+big2over 606 {
+    response {
+        errorcode 0 : integer
+    }
+}
+
+big2restart 607 {
+    request {
+        idx       0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+big2take_restart 608 {
+    response { 
+        errorcode 0 : integer
+    }
+}
+
+# 结算
+big2settle 609 {
+    request {
+        settles 0 : *settle
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+big2final_settle 610 {
+    request {
+        p1 0 : *settlementitem
+        p2 1 : *settlementitem
+        p3 2 : *settlementitem
+        p4 3 : *settlementitem
+        over    4 : boolean
+    } 
+    response {
+        errorcode 0 : integer
+    }
+}
+
+big2match 611 {
+    request {
+        roomid 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+big2rejoin 612 {
+    request {
+        p 0 : big2player
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+big2join 613 {
+    request {
+        p 0 : big2player
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+big2leave 614 {
+    request {
+        idx       0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+big2take_ready 615 {
+    request {
+        idx       0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }   
+}
+
+# 大老二模块结束
+####################################### 

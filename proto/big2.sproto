@@ -1,0 +1,30 @@
+####################################### 
+# big2 类
+.big2rule {
+    multi 0 : integer
+}
+
+.big2lead {
+    leadtype 0 : integer
+    cards 1 : *card
+}
+
+.big2player {
+    idx 0 : integer
+    chip 1 : integer
+    sex 2 : integer
+    name 3 : string
+    state 4 : string
+    online 5 : boolean
+    cards 6 : *card         # 手上的牌
+    opcode 7 : integer
+    lead 8 : big2lead
+}
+
+.big2playerdeal {
+    idx 0 : integer
+    cards 1 : *card
+}
+
+# big2 类
+####################################### 

@@ -61,7 +61,7 @@ lappend(lua_State *L) {
 static int
 llog(lua_State *L) {
 	struct xloggerd *inst = lua_touserdata(L, 1);
-	int top = lua_gettop(L);
+	// int top = lua_gettop(L);
 	int level = luaL_checkinteger(L, 2);
 	size_t sz;
 	const char *buf = luaL_checklstring(L, 3, &sz);

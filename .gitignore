@@ -1,6 +1,7 @@
 *.o
 *.a
 /skynet
+/strawberry
 /skynet.pid
 3rd/lua/lua
 3rd/lua/luac
@@ -9,3 +10,4 @@
 *.so
 *.dSYM
 .DS_Store
+.vscode

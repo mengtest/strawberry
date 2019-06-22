@@ -21,7 +21,8 @@
 #else
 #include <unistd.h>
 #include <dirent.h>
-#define XLOG_MAXPATHLEN      MAXPATHLEN
+#include <limits.h>
+#define XLOG_MAXPATHLEN      PATH_MAX
 #endif // DEBUG
 
 #define ONE_MB	          (1024*1024)
@@ -66,11 +67,11 @@ check_and_create_dir_(char *fullpath, int count) {
 	}
 #else
 	// ��������ڣ������ļ���
-	DIR* dir = opendir(basepath);
+	DIR* dir = opendir(fullpath);
 	if (dir == NULL) {
 		switch (errno) {
 		case ENOENT:
-			if (mkdir(basepath, 0755) == -1) {
+			if (mkdir(fullpath, 0755) == -1) {
 				fprintf(stderr, "mkdir error: %s\n", strerror(errno));
 				return XLOG_ERR_MKDIR;
 			}
@@ -79,7 +80,7 @@ check_and_create_dir_(char *fullpath, int count) {
 			fprintf(stderr, "opendir error: %s\n", strerror(errno));
 			return XLOG_ERR_MKDIR;
 		}
-		return XLOG_ERR_OK;
+		return XLOG_OK;
 	} else
 		closedir(dir);
 #endif
@@ -114,7 +115,6 @@ get_filename(char *datepath, int count, logger_level level, char *filename, size
 
 	char timebuf[32] = { 0 };
 	strftime(timebuf, sizeof(timebuf), "%Y%m%d", tm);
-#if defined(_MSC_VER)
 	if (level == LOG_DEBUG) {
 		snprintf(filename, filename_count, "%s\\%llu-%s.log", datepath, cs, "debug");
 	} else if (level == LOG_INFO) {
@@ -126,26 +126,14 @@ get_filename(char *datepath, int count, logger_level level, char *filename, size
 	} else if (level == LOG_FATAL) {
 		snprintf(filename, filename_count, "%s\\%llu-%s.log", datepath, cs, "fatal");
 	}
-#else 
-	if (level == LOG_DEBUG) {
-		snprintf(filename, count, "%s/%s-%s-%llu.log", basepath, timebuf, "debug", cs);
-	} else if (level == LOG_INFO) {
-		snprintf(filename, count, "%s/%s-%s-%llu.log", basepath, timebuf, "info", cs);
-	} else if (level == LOG_WARNING) {
-		snprintf(filename, count, "%s/%s-%s-%llu.log", basepath, timebuf, "warning", cs);
-	} else if (level == LOG_ERROR) {
-		snprintf(filename, count, "%s/%s-%s-%llu.log", basepath, timebuf, "error", cs);
-	} else if (level == LOG_FATAL) {
-		snprintf(filename, count, "%s/%s-%s-%llu.log", basepath, timebuf, "fatal", cs);
-	}
-#endif
 	return strlen(filename);
 }
 
 static int
 check_file(const char *datepath, logger_level loglevel) {
 	char fullpath[XLOG_MAXPATHLEN] = { 0 };
-	for (size_t i = loglevel; i < LOG_MAX; i++) {
+	int i = loglevel;
+	for (; i < LOG_MAX; i++) {
 		// create
 		memset(fullpath, 0, XLOG_MAXPATHLEN);
 		size_t len = get_filename(datepath, strlen(datepath), i, fullpath, XLOG_MAXPATHLEN);
@@ -221,7 +209,7 @@ check_dir(const char *path, char *basepath, int *sz) {
 				basepath[k++] = '\\';
 #else
 			if (i < j)
-				fullpath[k++] = '/';
+				basepath[k++] = '/';
 #endif // _MSC_VER
 			continue;
 		}
@@ -235,7 +223,8 @@ check_dir(const char *path, char *basepath, int *sz) {
 static int
 xloggerdd_init_(struct xloggerdd *self, const char *datepath) {
 	char fullpath[XLOG_MAXPATHLEN] = { 0 };
-	for (size_t i = self->loglevel; i < LOG_MAX; i++) {
+	int i = self->loglevel;
+	for (; i < LOG_MAX; i++) {
 		// create
 		memset(fullpath, 0, XLOG_MAXPATHLEN);
 		size_t len = get_filename(datepath, strlen(datepath), i, fullpath, XLOG_MAXPATHLEN);
@@ -319,7 +308,8 @@ xloggerdd_create(const char *path, logger_level loglevel, size_t rollsize) {
 void
 xloggerdd_release(struct xloggerdd *self) {
 	xloggerdd_flush(self);
-	for (size_t i = self->loglevel; i < LOG_MAX; i++) {
+	int i = self->loglevel;
+	for (; i < LOG_MAX; i++) {
 		FILE *f = self->handle[i];
 		if (f == NULL || f == stdout) {
 			continue;
@@ -384,7 +374,8 @@ xloggerdd_flush(struct xloggerdd *self) {
 	}
 	INIT_LIST_HEAD(&self->head);
 
-	for (size_t i = self->loglevel; i < LOG_MAX; i++) {
+	int i = self->loglevel;
+	for (; i < LOG_MAX; i++) {
 		FILE *f = self->handle[i];
 		if (f == NULL) {
 			continue;
@@ -405,7 +396,8 @@ xloggerdd_check_roll(struct xloggerdd *self) {
 	}
 
 	// check roll
-	for (size_t i = self->loglevel; i < LOG_MAX; i++) {
+	int i = self->loglevel;
+	for (; i < LOG_MAX; i++) {
 		FILE *f = self->handle[i];
 		if (f == NULL) {
 			continue;

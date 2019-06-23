@@ -5,5 +5,5 @@ local log = require "chestnut.skynet.log"
 skynet.start(function()
 	skynet.send("CODWEB", "lua", "kill")
 	-- skynet.exit()
-	-- skynet.abort()
+	skynet.abort()
 end)

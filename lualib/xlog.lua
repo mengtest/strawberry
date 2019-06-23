@@ -57,20 +57,20 @@ function _M.fields(fields)
 		info = function (fmt, ... )
 			-- body
 			local msg  = string_format(fmt, ...)
-			log('debug', file, line, fields, msg)
+			log('info', file, line, fields, msg)
 		end,
 		warning = function (fmt, ... )
 			-- body
 			local msg  = string_format(fmt, ...)
-			log('debug', file, line, fields, msg)
+			log('warning', file, line, fields, msg)
 		end,
 		error = function (fmt, ...)
 			local msg  = string_format(fmt, ...)
-			log('debug', file, line, fields, msg)
+			log('error', file, line, fields, msg)
 		end,
 		fatal = function (fmt, ...)
 			local msg  = string_format(fmt, ...)
-			log('debug', file, line, fields, msg)
+			log('fatal', file, line, fields, msg)
 		end
 	}
 end

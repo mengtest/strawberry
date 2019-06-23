@@ -3,6 +3,7 @@ local crypt = require "skynet.crypt"
 local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
 local servicecode = require "enum.servicecode"
+local gserver = require 'server'
 
 local loginservice = ".LOGIND"
 local servername
@@ -163,8 +164,9 @@ function server.register_handler(name)
 	skynet.error(string.format("reister gate server: %s", name))
 	servername = name
 	local gated = skynet.getenv "gated"
-	skynet.call(loginservice, "lua", "register_gate", servername, skynet.self(), gated)
-	skynet.error('gatea')
+	gserver.call(loginservice, "lua", "register_gate", servername, skynet.self(), gated)
+	log.fields({ servername = servername }).info('register gated')
+	-- log.info('register gated')
 end
 
 msgserver.start(server)

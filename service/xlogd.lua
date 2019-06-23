@@ -56,9 +56,6 @@ function CMD.log(data)
 	return service.NORET
 end
 
-function CMD.append(data)
-end
-
 service.init {
 	init = function ()
 		-- print(tableDump(cfg))

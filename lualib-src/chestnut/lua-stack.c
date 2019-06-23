@@ -109,7 +109,8 @@ lalloc(lua_State *L) {
 	lua_pushvalue(L, lua_upvalueindex(1));
 	lua_setmetatable(L, -2);
 
-	for (int i = 1; i <= n; i++) {
+	int i = 1;
+	for (; i <= n; i++) {
 		lua_pushvalue(L, i);
 		lua_rawseti(L, -2, i);
 	}

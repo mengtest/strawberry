@@ -1,7 +1,7 @@
 local skynet = require "skynet"
 require "skynet.manager"
 local crypt = require "skynet.crypt"
-local httpsc = require "https.httpc"
+local httpsc = require "http.httpc"
 local log = require "chestnut.skynet.log"
 local guid = require "guid"
 
@@ -164,21 +164,6 @@ local function auth_android_wx(code, ... )
 end
 
 local CMD = {}
-
-function CMD.start()
-	-- body
-	return true
-end
-
-function CMD.close()
-	-- body
-	return true
-end
-
-function CMD.kill()
-	-- body
-	skynet.exit()
-end
 
 function CMD.signup(server, code, ... )
 	-- body

@@ -21,8 +21,8 @@ update3rd :
 
 LUA_CLIB = aoi \
   chestnut crab math3d rapidjson \
-  skiplist \
-  xlog
+  skiplist xlog \
+  lfs
 
 LUA_CLIB_FIXMATH = \
   lua-skynet.c lua-seri.c \
@@ -44,7 +44,7 @@ LUA_CLIB_FIXMATH = \
 
 all : \
 	strawberry \
-  	$(foreach v, $(LUA_CLIB), $(LUA_CLIB_PATH)/$(v).so) 
+  $(foreach v, $(LUA_CLIB), $(LUA_CLIB_PATH)/$(v).so) 
 
 $(LUA_CLIB_PATH) :
 	mkdir $(LUA_CLIB_PATH)
@@ -55,8 +55,10 @@ $(CSERVICE_PATH) :
 $(LUA_CLIB_PATH)/aoi.so : lualib-src/aoi/aoi.c lualib-src/aoi/lua-aoi.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) -Ilualib-src/aoi $^ -o $@ 
 
-$(LUA_CLIB_PATH)/chestnut.so : lualib-src/chestnut/lua-array.c lualib-src/chestnut/lua-float.c | $(LUA_CLIB_PATH)
-	$(CC) $(CFLAGS) $(SHARED) -Ilualib-src/chestnut $^ -o $@
+$(LUA_CLIB_PATH)/chestnut.so : lualib-src/chestnut/lua-array.c lualib-src/chestnut/lua-float.c \
+  lualib-src/chestnut/lua-queue.c lualib-src/chestnut/lua-snowflake.c lualib-src/chestnut/lua-sortedvector.c \
+  lualib-src/chestnut/lua-stack.c lualib-src/chestnut/lua-vector.c | $(LUA_CLIB_PATH)
+	$(CC) $(CFLAGS) $(SHARED) -Ilualib-src/chestnut -Iskynet/skynet-src $^ -o $@
 
 $(LUA_CLIB_PATH)/crab.so : lualib-src/crab/crab.c lualib-src/crab/lua-crab.c lualib-src/crab/lua-utf8.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) -Ilualib-src/crab $^ -o $@
@@ -73,6 +75,9 @@ $(LUA_CLIB_PATH)/skiplist.so : lualib-src/skiplist/skiplist.c lualib-src/skiplis
 
 $(LUA_CLIB_PATH)/xlog.so : lualib-src/xlog/lua-host.c lualib-src/xlog/xloggerdd.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) -Ilualib-src/xlog $^ -o $@
+
+$(LUA_CLIB_PATH)/lfs.so : 3rd/luafilesystem/lfs.c | $(LUA_CLIB_PATH)
+	$(CC) $(CFLAGS) $(SHARED) -I3rd/luafilesystem $^ -o $@
 
 clean :
 	rm -f $(LUA_CLIB_PATH)/*.so

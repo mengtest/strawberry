@@ -113,8 +113,9 @@ get_filename(char *datepath, int count, logger_level level, char *filename, size
 	struct tm *tm = localtime(&cs);
 	assert(tm != NULL);
 
-	char timebuf[32] = { 0 };
-	strftime(timebuf, sizeof(timebuf), "%Y%m%d", tm);
+	// char timebuf[32] = { 0 };
+	// strftime(timebuf, sizeof(timebuf), "%Y%m%d", tm);
+#if defined(_MSC_VER)
 	if (level == LOG_DEBUG) {
 		snprintf(filename, filename_count, "%s\\%llu-%s.log", datepath, cs, "debug");
 	} else if (level == LOG_INFO) {
@@ -126,6 +127,19 @@ get_filename(char *datepath, int count, logger_level level, char *filename, size
 	} else if (level == LOG_FATAL) {
 		snprintf(filename, filename_count, "%s\\%llu-%s.log", datepath, cs, "fatal");
 	}
+#else
+	if (level == LOG_DEBUG) {
+		snprintf(filename, filename_count, "%s/%llu-%s.log", datepath, cs, "debug");
+	} else if (level == LOG_INFO) {
+		snprintf(filename, filename_count, "%s/%llu-%s.log", datepath, cs, "info");
+	} else if (level == LOG_WARNING) {
+		snprintf(filename, filename_count, "%s/%llu-%s.log", datepath, cs, "warning");
+	} else if (level == LOG_ERROR) {
+		snprintf(filename, filename_count, "%s/%llu-%s.log", datepath, cs, "error");
+	} else if (level == LOG_FATAL) {
+		snprintf(filename, filename_count, "%s/%llu-%s.log", datepath, cs, "fatal");
+	}
+#endif
 	return strlen(filename);
 }
 

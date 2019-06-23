@@ -6,24 +6,6 @@ local internal_id = 1
 
 local cmd = {}
 
-function cmd.start( ... )
-	-- body
-	return true
-end
-
-function cmd.init_data()
-	return true
-end
-
-function cmd.sayhi()
-	return true
-end
-
-function cmd.close( ... )
-	-- body
-	return true
-end
-
 function cmd.enter( ... )
 	-- body
 	internal_id = internal_id + 1

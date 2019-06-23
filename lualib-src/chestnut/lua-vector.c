@@ -38,7 +38,8 @@ lclear(lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTABLE);
 	lua_rawgeti(L, 1, 0);
 	lua_Integer sparselen = luaL_checkinteger(L, -1);
-	for (lua_Integer i = 1; i <= sparselen; ++i) {
+	lua_Integer i = 1;
+	for (; i <= sparselen; ++i) {
 		lua_pushnil(L);
 		lua_rawseti(L, 1, i);
 	}
@@ -106,7 +107,8 @@ lerase(lua_State *L) {
 	
 	lua_rawgeti(L, 1, 0);
 	lua_Integer sparselen = luaL_checkinteger(L, -1);
-	for (size_t i = 1; i <= sparselen; i++) {
+	size_t i = 1;
+	for (; i <= sparselen; i++) {
 		lua_rawgeti(L, 1, i);
 		lua_pushvalue(L, 2);
 		// check equil
@@ -336,7 +338,8 @@ lnewvector(lua_State *L) {
 	lua_pushvalue(L, lua_upvalueindex(1));
 	lua_setmetatable(L, -2);
 
-	for (int i = 1; i <= n; ++i) {
+	int i = 1;
+	for (; i <= n; ++i) {
 		lua_pushvalue(L, i);
 		lua_rawseti(L, -2, i);
 	}
@@ -372,7 +375,8 @@ luaopen_chestnut_vector(lua_State *L) {
 		{ NULL, NULL },
 	};
 	lua_createtable(L, 0, 9);
-	for (size_t i = 0; i < sizeof(l) / sizeof(luaL_Reg); i++) {
+	size_t i = 0;
+	for (; i < sizeof(l) / sizeof(luaL_Reg); i++) {
 		if (l[i].name) {
 			lua_pushstring(L, l[i].name);
 			lua_pushcfunction(L, l[i].func);

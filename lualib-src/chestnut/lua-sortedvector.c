@@ -38,7 +38,8 @@ lclear(lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTABLE);
 	lua_rawgeti(L, 1, 0);
 	lua_Integer sparselen = luaL_checkinteger(L, -1);
-	for (lua_Integer i = 1; i <= sparselen; ++i) {
+	lua_Integer i = 1;
+	for (; i <= sparselen; ++i) {
 		lua_pushnil(L);
 		lua_rawseti(L, 1, i);
 	}
@@ -63,7 +64,8 @@ lerase(lua_State *L) {
 	size_t idx = 0;
 	lua_rawgeti(L, 1, 0);
 	lua_Integer sparselen = luaL_checkinteger(L, -1);
-	for (size_t i = 1; i <= sparselen; i++) {
+	size_t i = 1;
+	for (; i <= sparselen; i++) {
 		lua_rawgeti(L, 1, i);
 		if (lua_rawequal(L, -1, 2)) {
 			idx = i;
@@ -71,7 +73,7 @@ lerase(lua_State *L) {
 		}
 	}
 	if (idx != 0) {
-		for (size_t i = idx; i < sparselen; i++) {
+		for (i = idx; i < sparselen; i++) {
 			lua_rawgeti(L, 1, i + 1);
 			lua_rawseti(L, 1, i);
 		}
@@ -101,7 +103,8 @@ leraseat(lua_State *L) {
 	if (idx >= sparselen + 1) {
 		return luaL_error(L, "The index should be less then (%d)", (int)sparselen + 1);
 	}
-	for (size_t i = idx; i < sparselen; i++) {
+	size_t i = idx;
+	for (; i < sparselen; i++) {
 		lua_rawgeti(L, 1, i + 1);
 		lua_rawseti(L, 1, i);
 	}
@@ -239,7 +242,8 @@ lindexof(lua_State *L) {
 	size_t idx = 0;
 	lua_rawgeti(L, 1, 0);
 	lua_Integer sparselen = luaL_checkinteger(L, -1);
-	for (size_t i = 1; i <= sparselen; i++) {
+	size_t i = 1;
+	for (; i <= sparselen; i++) {
 		lua_rawgeti(L, 1, i);
 		if (lua_rawequal(L, -1, 2)) {
 			idx = i;
@@ -266,7 +270,8 @@ lcontains(lua_State *L) {
 	size_t idx = 0;
 	lua_rawgeti(L, 1, 0);
 	lua_Integer sparselen = luaL_checkinteger(L, -1);
-	for (size_t i = 1; i <= sparselen; i++) {
+	size_t i = 1;
+	for (; i <= sparselen; i++) {
 		lua_rawgeti(L, 1, i);
 		if (lua_rawequal(L, -1, 2)) {
 			idx = i;
@@ -330,7 +335,8 @@ lnewsortedvectorinit(lua_State *L) {
 	lua_pushvalue(L, lua_upvalueindex(1));
 	lua_setmetatable(L, -2);  // setmet
 
-	for (int i = 1; i <= n; ++i) {
+	int i = 1;
+	for (; i <= n; ++i) {
 		lua_pushvalue(L, i);
 		lua_rawseti(L, -2, i);
 	}
@@ -363,7 +369,8 @@ lnewsortedvector(lua_State *L) {
 		{ NULL, NULL },
 	};
 	lua_createtable(L, 0, 7);
-	for (size_t i = 0; i < sizeof(l) / sizeof(luaL_Reg); i++) {
+	size_t i = 0;
+	for (; i < sizeof(l) / sizeof(luaL_Reg); i++) {
 		if (l[i].name) {
 			lua_pushstring(L, l[i].name);
 			lua_pushcfunction(L, l[i].func);

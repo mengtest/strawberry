@@ -8,15 +8,19 @@ local request = require "chestnut.agent.request"
 local logout = require "chestnut.agent.logout"
 local savedata = require "savedata"
 local objmgr = require "objmgr"
+local dbc = require 'db.db'
+local command = require 'command'
+local _M = command.cmd1()
+local SUB = {}
 local assert = assert
 local traceback = debug.traceback
-local reload = false
+local _reload = false
 
 local function init_data(obj)
 	-- body
 	local uid = obj.uid
 	log.info("uid(%d) load_cache_to_data", uid)
-	local res = skynet.call(".DB", "lua", "read_user", uid)
+	local res = dbc.read_user(uid)
 	-- init user
 	local ok, err = xpcall(AgentSystems.on_data_init, traceback, obj, res)
 	if not ok then
@@ -26,31 +30,34 @@ local function init_data(obj)
 	return servicecode.SUCCESS
 end
 
-local function save_data(uid)
+local function save_data()
 	-- body
 	objmgr.foreach(function (obj, ... )
 		-- body
-		
+		if obj.authed then
+			local data = {}
+			local ok, err = xpcall(AgentSystems.on_data_save, traceback, obj, data)
+			if ok then
+				if table.length(data) > 0 then
+					dbc.write_user(data)
+				end
+			else
+				log.error(err)
+			end
+		end
 	end)
-	-- local data = {}
-	-- local ok, err = xpcall(self.systems.on_data_save, traceback, self.systems, data)
-	-- if not ok then
-	-- 	log.error(err)
-	-- else
-	-- 	skynet.call(".DB", "lua", "write_user", data)
-	-- end
 end
 
-local cls = {}
-
-local SUB = {}
+skynet.init(function ()
+	-- body
+end)
 
 function SUB.save_data( ... )
 	-- body
 	save_data()
 end
 
-function cls.start(channel_id, ... )
+function _M.start()
 	-- body
 	savedata.init({
 		command=SUB
@@ -58,27 +65,27 @@ function cls.start(channel_id, ... )
 	return true
 end
 
-function cls.init_data( ... )
+function _M.init_data()
 	-- body
 	return true
 end
 
-function cls.sayhi(reload)
+function _M.sayhi(reload)
+	-- 重连的时候，auth函数用此判断
+	_reload = reload
+	return true
+end
+
+function _M.close()
 	-- body
 	return true
 end
 
-function cls.close( ... )
-	-- body
-	self:save_data()
-	return cls.super.close(self, ... )
-end
-
-function cls.kill( ... )
+function _M.kill()
 	-- body
 end
 
-function cls.login(gate, uid, subid, secret)
+function _M.login(gate, uid, subid, secret)
 	local obj = objmgr.get(uid)
 	if obj then
 		obj.subid = subid
@@ -96,63 +103,61 @@ function cls.login(gate, uid, subid, secret)
 		obj.secret = secret
 		obj.logined = true
 		obj.authed = false
-		objmgr.add(uid, obj)
+		objmgr.add(obj)
 		-- TODO:
 		init_data(obj)
-		obj.logined = true
 		savedata.subscribe()
 	end
 	return servicecode.SUCCESS
 end
 
-function cls.logout(uid, ... )
+-- call by gated
+function _M.logout(uid)
 	-- body
 	local obj = objmgr.get(uid)
 	assert(obj.logined)
 	assert(obj.authed)
 	save_data(uid)
 
-	local ok = skynet.call(".AGENT_MGR", "lua", "exit_at_once", obj.uid)
-	if not ok then
-		log.error("call agent_mgr exit_at_once failture.")
-		return servicecode.FAIL
+	-- 断线重连
+	if true then
+		obj.logined = false
+		obj.authed = false
+		return skynet.call(".AGENT_MGR", "lua", "exit", obj.uid)
+	else
+		local ok = skynet.call(".AGENT_MGR", "lua", "exit_at_once", obj.uid)
+		if not ok then
+			log.error("call agent_mgr exit_at_once failture.")
+			return servicecode.FAIL
+		end
+		objmgr.del(obj)
+		log.info("uid(%d) agent logout", obj.uid)
 	end
-
-	obj.authed = false
-	obj.logined = false
-	log.info("uid(%d) agent logout", obj.uid)
 	return servicecode.SUCCESS
 end
 
-function cls.auth(args)
+-- call by agent mgr
+function _M.kill_cache(uid)
 	-- body
-	-- if not self.channelSubscribed then
-	-- 	log.info("uid(%d) subscribe channel_id", self.uid)
-	-- 	self.channelSubscribed = true
-	-- 	self.channel:subscribe()
-	-- end
+	local obj = objmgr.get(uid)
+	assert(obj)
+	objmgr.del(obj)
+	log.info("uid(%d) agent kill cache", uid)
+	return servicecode.SUCCESS
+end
+
+function _M.auth(args)
 	local obj = assert(objmgr.get(args.uid))
 	obj.fd = args.client
 	obj.authed = true
-	objmgr.addfd(args.client, obj)
+	objmgr.addfd(obj)
+	assert(obj == objmgr.get(args.client))
 	return true
 end
 
-function cls.afk(fd)
+function _M.afk(fd)
 	-- body
 	log.info('agent fd(%d) afk', fd)
-	local obj = objmgr.get_by_fd(fd)
+	local obj = objmgr.get(fd)
 	return logout.logout(obj)
 end
-
-return setmetatable({}, { __index = function (t, cmd, uid, ...) 
-	return function (uid, ...)
-		if cls[cmd] then
-			return cls[cmd](uid, ...)
-		else
-			local obj = assert(objmgr.get(uid))
-			local f = assert(CMD[cmd])
-			return f(obj, ...)
-		end
-	end
-end})

@@ -6,7 +6,8 @@ local zset = require "chestnut.zset"
 local query = require "chestnut.query"
 local sysmaild = require "sysmaild"
 local client = require "client"
-
+local CH = client.request()
+local _M = {}
 
 local function send_inbox_list(obj, ... )
 	-- body
@@ -28,25 +29,27 @@ local function send_inbox_list(obj, ... )
 	client.push(obj, "inbox", args)
 end
 
-local cls = {}
+skynet.init(function ()
+	-- body
+end)
 
-function cls:on_data_init(dbData, ... )
+function _M:on_data_init(dbData)
 end
 
-function cls:on_data_save(dbData, ... )
+function _M:on_data_save(dbData)
 	-- body
 end
 
-function cls:on_enter( ... )
+function _M:on_enter( ... )
 	-- body
 	send_inbox_list(self)
 end
 
-function cls:on_exit( ... )
+function _M:on_exit( ... )
 	-- body
 end
 
-function cls:add(mail, ... )
+function _M:add(mail, ... )
 	-- body
 	table.insert(self._data, mail)
 	self._count = self._count + 1
@@ -54,7 +57,7 @@ function cls:add(mail, ... )
 	self._mkzs:add(1, string.format("%d", mail.id.value))
 end
 
-function cls:poll( ... )
+function _M:poll( ... )
 	-- body
 	skynet.fork(function ( ... )
 		-- body
@@ -80,7 +83,7 @@ function cls:poll( ... )
 	end)
 end
 
-function cls:send_inbox(id, ... )
+function _M:send_inbox(id, ... )
 	-- body
 	local v = assert(self._mk[id])
 	local l = {}
@@ -95,8 +98,6 @@ function cls:send_inbox(id, ... )
 	args.l = l
 	self.context:send_request("inbox", args)
 end
-
-local CH = client.request()
 
 function CH:fetch(args, ... )
 	-- body
@@ -149,8 +150,4 @@ function CH:viewed(args, ... )
 	return res
 end
 
-function CMD.aa( ... )
-	-- body
-end
-
-return cls
+return _M

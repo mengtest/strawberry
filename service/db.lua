@@ -1,9 +1,9 @@
 local skynet = require "skynet"
 require "skynet.manager"
-local mysql = require "skynet.db.mysql"
 local log = require "chestnut.skynet.log"
 local db_read = require "db.db_read"
 local db_write = require "db.db_write"
+local util = require 'db.util'
 local traceback = debug.traceback
 local assert = assert
 
@@ -14,78 +14,11 @@ if mode == "agent" then
 local db
 local ctx
 
-local function dump(obj)
-    local getIndent, quoteStr, wrapKey, wrapVal, dumpObj
-    getIndent = function(level)
-        return string.rep("\t", level)
-    end
-    quoteStr = function(str)
-        return '"' .. string.gsub(str, '"', '\\"') .. '"'
-    end
-    wrapKey = function(val)
-        if type(val) == "number" then
-            return "[" .. val .. "]"
-        elseif type(val) == "string" then
-            return "[" .. quoteStr(val) .. "]"
-        else
-            return "[" .. tostring(val) .. "]"
-        end
-    end
-    wrapVal = function(val, level)
-        if type(val) == "table" then
-            return dumpObj(val, level)
-        elseif type(val) == "number" then
-            return val
-        elseif type(val) == "string" then
-            return quoteStr(val)
-        else
-            return tostring(val)
-        end
-    end
-    dumpObj = function(obj, level)
-        if type(obj) ~= "table" then
-            return wrapVal(obj)
-        end
-        level = level + 1
-        local tokens = {}
-        tokens[#tokens + 1] = "{"
-        for k, v in pairs(obj) do
-            tokens[#tokens + 1] = getIndent(level) .. wrapKey(k) .. " = " .. wrapVal(v, level) .. ","
-        end
-        tokens[#tokens + 1] = getIndent(level - 1) .. "}"
-        return table.concat(tokens, "\n")
-    end
-    return dumpObj(obj, 0)
-end
-
-local function connect_mysql()
-	local function on_connect( db )
-		db:query( "set charset utf8" )
-	end
-	local c = {
-		host = skynet.getenv("db_host") or "127.0.0.1",
-		port = skynet.getenv("db_port") or 3306,
-		database = skynet.getenv("db_database") or "user",
-		user = skynet.getenv("db_user") or "root",
-		password = skynet.getenv("db_password") or "123456",
-		max_packet_size = 1024 * 1024,
-		on_connect = on_connect,
-	}
-	return mysql.connect(c)
-end
-
-local function disconnect_mysql( ... )
-	-- body
-	if db then
-		db:disconnect()
-	end
-end
-
 local QUERY = {}
 
 function QUERY.close()
 	-- body
-	disconnect_mysql()
+	util.disconnect_mysql(db)
 end
 
 function QUERY.kill()
@@ -141,15 +74,17 @@ end
 
 ------------------------------------------
 -- 写数据
-function QUERY.write_new_account(db_account)
+function QUERY.write_account(db_account)
 	db_write.write_account(ctx, db_account)
-	return true
 end
 
-function QUERY.write_new_user(db_user)
+function QUERY.write_union(db_union)
+	-- body
+end
+
+function QUERY.write_user(db_user)
 	-- body
 	db_write.write_user(ctx, db_user)
-	return true
 end
 
 function QUERY.write_user(data)
@@ -158,21 +93,18 @@ function QUERY.write_user(data)
 	db_write.write_user_room(ctx, data.db_user_room)
 	db_write.write_user_package(ctx, data.db_user_package)
 	db_write.write_user_funcopen(ctx, data.db_user_funcopens)
-	return true
 end
 
 function QUERY.write_room_mgr(data)
 	-- body
 	db_write.write_room_mgr_users(ctx, data.db_users)
 	db_write.write_room_mgr_rooms(ctx, data.db_rooms)
-	return true
 end
 
 function QUERY.write_room(data)
 	-- body
 	db_write.write_room_users(ctx, data.db_users)
 	db_write.write_room(ctx, data.db_room)
-	return true
 end
 
 ------------------------------------------
@@ -180,23 +112,23 @@ end
 function QUERY.write_offuser_room(db_user_room)
 	-- body
 	db_write.write_offuser_room_created(ctx, db_user_room)
-	return true
 end
 
 -------------------------------------------------------------end
 
 skynet.start(function ()
 	-- body
-	db = connect_mysql()
-	ctx = { db=db, dump=dump }
+	db = util.connect_mysql()
+	ctx = { db=db, dump= util.dump }
 	skynet.dispatch( "lua" , function( _, _, cmd, ... )
 		local f = assert(QUERY[cmd])
 		local ok, err = xpcall(f, traceback, ...)
 		if ok then
-			assert(err)
-			skynet.retpack(err)
+			if err then
+				skynet.retpack(err)
+			end
 		else
-			log.error(err)
+			log.error('db agent cmd = [%s], err = %s', cmd, err)
 		end
 	end)
 end)
@@ -209,12 +141,18 @@ skynet.start(function ()
 		agent[i] = skynet.newservice(SERVICE_NAME, "agent")
 	end
 	local balance = 1
-	skynet.dispatch( "lua" , function( _, _, ... )
-		local r = skynet.call(agent[balance], "lua", ... )
-		skynet.retpack(r)
-		balance = balance + 1
-		if balance > #agent then
-			balance = 1
+	skynet.dispatch( "lua" , function( _, _, cmd, ... )
+		local d = cmd:sub(1, 1)
+		if d == 'r' then
+			local r = skynet.call(agent[balance], "lua", cmd, ... )
+			assert(r)
+			skynet.retpack(r)
+			balance = balance + 1
+			if balance > #agent then
+				balance = 2
+			end
+		elseif d == 'w' then
+			skynet.send(agent[1], "lua", cmd, ... )
 		end
 	end)
 	skynet.register ".DB"

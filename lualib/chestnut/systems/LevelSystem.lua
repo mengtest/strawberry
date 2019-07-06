@@ -1,19 +1,28 @@
--- local log = require "chestnut.skynet.log"
+local skynet = require 'skynet'
+local log = require "chestnut.skynet.log"
 local ds = require "skynet.datasheet"
+local _M = {}
 
-local cls = {}
+skynet.init(function ()
+end)
 
-function cls:on_data_init(dbData)
+function _M:on_data_init(dbData)
 	-- body
 	assert(self)
 end
 
-function cls:on_data_save(dbData, ... )
+function _M:on_data_save(dbData)
 	-- body
 	assert(self)
 end
 
-function cls:add_exp(exp)
+function _M:on_enter()
+end
+
+function _M:on_exit()
+end
+
+function _M:add_exp(exp)
 	-- body
 	assert(self)
 	assert(exp > 0)
@@ -25,4 +34,4 @@ function cls:add_exp(exp)
 	end
 end
 
-return cls
+return _M

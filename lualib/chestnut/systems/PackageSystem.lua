@@ -1,10 +1,11 @@
+local skynet = require 'skynet'
 local log = require "chestnut.skynet.log"
 local PackageType = require "enum.PackageType"
 local ds = require "skynet.datasheet"
 
-local cls = {}
+local _M = {}
 
-function cls:_increase(pt, id, num)
+function _M:_increase(pt, id, num)
 	-- body
 	local uid = self.agentContext.uid
 	local index = self.context:get_entity_index(UserComponent)
@@ -20,7 +21,7 @@ function cls:_increase(pt, id, num)
 	return true
 end
 
-function cls:_decrease(pt, id, num)
+function _M:_decrease(pt, id, num)
 	-- body
 	local uid = self.agentContext.uid
 	local index = self.context:get_entity_index(UserComponent)
@@ -41,12 +42,12 @@ function cls:_decrease(pt, id, num)
 	return true
 end
 
-function cls:set_agent_systems(systems)
+function _M:set_agent_systems(systems)
 	-- body
 	self.agentSystems = systems
 end
 
-function cls:on_data_init(dbData)
+function _M:on_data_init(dbData)
 	-- body
 	assert(dbData ~= nil)
 	assert(dbData.db_user_packages ~= nil and #dbData.db_user_packages >= 0)
@@ -65,24 +66,32 @@ function cls:on_data_init(dbData)
 	self.dbPackages[PackageType.COMMON] = package
 end
 
-function cls:on_data_save(dbData, ... )
+function _M:on_data_save(dbData, ... )
 	-- body
 	assert(dbData ~= nil)
-	local set = self.dbPackages[PackageType.COMMON]
-	local package = {}
-	for _,db_item in pairs(set) do
-		local item = {}
-		item.uid = self.agentContext.uid
-		item.id = assert(db_item.id)
-		item.num = assert(db_item.num)
-		item.create_at = assert(db_item.createAt)
-		item.update_at = assert(db_item.updateAt)
-		package[tonumber(item.id)] = item
-	end
-	dbData.db_user_package = package
+	-- local set = self.dbPackages[PackageType.COMMON]
+	-- local package = {}
+	-- for _,db_item in pairs(set) do
+	-- 	local item = {}
+	-- 	item.uid = self.agentContext.uid
+	-- 	item.id = assert(db_item.id)
+	-- 	item.num = assert(db_item.num)
+	-- 	item.create_at = assert(db_item.createAt)
+	-- 	item.update_at = assert(db_item.updateAt)
+	-- 	package[tonumber(item.id)] = item
+	-- end
+	-- dbData.db_user_package = package
 end
 
-function cls:on_func_open()
+function _M:on_enter()
+	-- body
+end
+
+function _M:on_exit()
+	-- body
+end
+
+function _M:on_func_open()
 	-- body
 	local uid = self.agentContext.uid
 	local index = self.context:get_entity_index(UserComponent)
@@ -95,7 +104,7 @@ function cls:on_func_open()
 	entity.package.packages[PackageType.COMMON][4] = { id=4, num=100, createAt=os.time(), updateAt=os.time() }   -- 门票
 end
 
-function cls:check_consume(id, value)
+function _M:check_consume(id, value)
 	-- body
 	local uid = self.agentContext.uid
 	local index = self.context:get_entity_index(UserComponent)
@@ -110,7 +119,7 @@ function cls:check_consume(id, value)
 	return true
 end
 
-function cls:consume(id, value)
+function _M:consume(id, value)
 	-- body
 	if not self:check_consume(id, value) then
 		return false
@@ -119,7 +128,7 @@ function cls:consume(id, value)
 	return self:_decrease(itemConfig.type, id, value)
 end
 
-function cls:rcard_num()
+function _M:rcard_num()
 	-- body
 	local uid = self.agentContext.uid
 	local index = self.context:get_entity_index(UserComponent)
@@ -134,7 +143,7 @@ function cls:rcard_num()
 	return item.num
 end
 
-function cls:package_info()
+function _M:package_info()
 	-- body
 	local uid = self.agentContext.uid
 	local index = self.context:get_entity_index(UserComponent)
@@ -153,4 +162,4 @@ function cls:package_info()
 	return res
 end
 
-return cls
+return _M

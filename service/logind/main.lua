@@ -1,20 +1,12 @@
 local skynet = require "skynet"
 require "skynet.manager"
 local log = require "chestnut.skynet.log"
-local cluster = require "skynet.cluster"
+local server = require 'server'
 
 skynet.start(function()
 
 	-- open cluster
-	local gm = skynet.getenv 'cluster_gm'
-	local logind = skynet.getenv 'cluster_logind'
-	local game1 = skynet.getenv 'cluster_game1'
-	cluster.reload({
-		gm = gm,
-		logind = logind,
-		game1 = game1
-	})
-	cluster.open 'logind'
+	server.host.open_logind()
 
 	local console = skynet.newservice("console")
 	skynet.newservice("debug_console",8000)
@@ -28,7 +20,7 @@ skynet.start(function()
 		local logind = skynet.getenv("logind") or "0.0.0.0:3002"
 		local addr = skynet.newservice("logind/logind", logind)
 		skynet.name(".LOGIND", addr)
-
+		server.host.register_service('.LOGIND', addr)
 	else 
 		skynet.uniqueservice("wslogind")
 		local wsgated = skynet.uniqueservice('wsgated')

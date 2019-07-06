@@ -3,19 +3,12 @@ require "skynet.manager"
 local log = require "chestnut.skynet.log"
 local cluster = require "skynet.cluster"
 local lifemgr = require 'lifemgr'
+local server = require 'server'
 
 skynet.start(function()
 
 	-- open cluster
-	local gm = skynet.getenv 'cluster_gm'
-	local logind = skynet.getenv 'cluster_logind'
-	local game1 = skynet.getenv 'cluster_game1'
-	cluster.reload({
-		gm = gm,
-		logind = logind,
-		game1 = game1
-	})
-	cluster.open 'game1'
+	server.host.open_game1()
 
 	local console = skynet.newservice("console")
 	skynet.newservice("debug_console",8001)
@@ -23,9 +16,18 @@ skynet.start(function()
 	skynet.uniqueservice("protoloader")
 	-- config
 	skynet.uniqueservice("chestnut/sdata_mgr")
+
+	local dbinitd = skynet.newservice('dbinitd')
+	local ok = skynet.call(dbinitd, 'lua', 'initdb')
+	if not ok then
+		log.error('init db error')
+		skynet.exit()
+		return
+	end
+
 	skynet.uniqueservice("db")
 	skynet.uniqueservice("chestnut/sid_mgr")
-
+	skynet.uniqueservice("chestnut/agent_mgr")
 	lifemgr.uniqueservice("chestnut/radio_mgr")
 	lifemgr.uniqueservice("chestnut/chat_mgr")
 	lifemgr.uniqueservice("chestnut/mail_mgr")
@@ -35,8 +37,7 @@ skynet.start(function()
 	lifemgr.uniqueservice("chestnut/friend_mgr")
 	lifemgr.uniqueservice("chestnut/zset_mgr")
 	lifemgr.uniqueservice('chestnut/room_mgr')
-	lifemgr.uniqueservice("chestnut/agent_mgr")
-
+	
 	local loginType = skynet.getenv 'login_type'
 	if loginType == 'so' then
 		-- local verify = skynet.uniqueservice("logind/logindverify")
@@ -52,6 +53,7 @@ skynet.start(function()
 		local max_client = skynet.getenv("maxclient") or 1024
 		local gate = skynet.uniqueservice("chestnut/gated")
 		skynet.call(gate, "lua", "open", {
+			gated = gated,
 			address = address or "0.0.0.0",
 			port = port,
 			maxclient = tonumber(max_client),

@@ -3,6 +3,7 @@ local crypt = require "skynet.crypt"
 local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
 local servicecode = require "enum.servicecode"
+local gserver = require 'server'
 
 local address, port = string.match(skynet.getenv("logind"), "([%d.]+)%:(%d+)")
 local logind_name = skynet.getenv "logind_name"
@@ -50,13 +51,15 @@ function server.login_handler(server, uid, secret)
 		-- else
 		-- 	log.info("uid(%d) logined again, last address has logout, end ---------- ", uid)
 		-- end
+		log.error(string.format("uid(%d) already online", uid))
 		error(string.format("uid(%d) already online", uid))
 	end
 	if user_online[uid] then
+		log.error(string.format("user %s is already online", uid))
 		error(string.format("user %s is already online", uid))
 	end
 	
-	local res = skynet.call(gameserver.address, "lua", "login", uid, secret)
+	local res = gserver.call(gameserver.address, "lua", "login", uid, secret)
 	if res.errorcode == servicecode.SUCCESS then 
 		user_online[uid] = { address = gameserver.address, subid = res.subid , server = server}
 		local gated = gameserver.gated
@@ -65,9 +68,10 @@ function server.login_handler(server, uid, secret)
 		return key
 	elseif res.errorcode == servicecode.LOGIN_AGENT_LOAD_ERR then
 		log.error("LOGIN_AGENT_LOAD_ERR.")
-		error("LOGIN_AGENT_LOAD_ERR")
+		error('LOGIN_AGENT_LOAD_ERR')
 	else
-		error("gen subid is wrong")
+		log.error("gen subid is wrong")
+		error('gen subid is wrong')
 	end
 end
 
@@ -86,7 +90,7 @@ function CMD.logout(uid, subid)
 	local u = user_online[uid]
 	if u then
 		log.info(string.format("%s@%s is logout", uid, u.server))
-		local err = skynet.call(u.address, 'lua', 'kick', uid, subid)
+		local err = gserver.call(u.address, 'lua', 'kick', uid, subid)
 		if err == servicecode.SUCCESS then
 			user_online[uid] = nil
 		end

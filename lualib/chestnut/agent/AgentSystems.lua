@@ -33,7 +33,7 @@ function Processors:on_enter()
 end
 
 function Processors:on_exit()
-    
+    RoomSystem.on_exit(self)
 end
 
 function Processors:on_new_day()

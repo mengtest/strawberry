@@ -1,4 +1,5 @@
 local skynet = require "skynet"
+local StackTracePlus = require 'StackTracePlus'
 local debug = debug
 local string_format = string.format
 local skynet_error = skynet.error
@@ -66,7 +67,8 @@ function _M.fields(fields)
 		end,
 		error = function (fmt, ...)
 			local msg  = string_format(fmt, ...)
-			log('error', file, line, fields, msg)
+			local stackmsg = StackTracePlus.stacktrace(msg, 2)
+			log('error', file, line, fields, stackmsg)
 		end,
 		fatal = function (fmt, ...)
 			local msg  = string_format(fmt, ...)
@@ -104,7 +106,8 @@ function _M.error(fmt, ...)
 	local info = debug.getinfo(2)
 	local file = info.short_src
 	local line = info.currentline
-	log('error', file, line, {}, msg)
+	local stackmsg = StackTracePlus.stacktrace(msg, 2)
+	log('error', file, line, {}, stackmsg)
 end
 
 function _M.fatal(fmt, ...)

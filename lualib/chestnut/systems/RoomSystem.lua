@@ -3,11 +3,11 @@ local ds = require "skynet.datasheet"
 local log = require "chestnut.skynet.log"
 local client = require "client"
 
-local cls = {}
+local _M = {}
 
 ------------------------------------------
 -- event
-function cls:on_data_init(dbData)
+function _M:on_data_init(dbData)
 	-- body
 	assert(dbData)
 	assert(dbData.db_user_rooms ~= nil and #dbData.db_user_rooms >= 0)
@@ -32,21 +32,21 @@ function cls:on_data_init(dbData)
 	end
 end
 
-function cls:on_data_save(dbData, ... )
+function _M:on_data_save(dbData)
 	-- body
 	assert(dbData ~= nil)
-	dbData.db_user_room = {}
-	dbData.db_user_room.uid = self.agentContext.uid
-	dbData.db_user_room.roomid  = self.dbRoom.id
-	dbData.db_user_room.type    = self.dbRoom.type
-	dbData.db_user_room.mode    = self.dbRoom.mode
-	dbData.db_user_room.created = self.dbRoom.isCreated and 1 or 0
-	dbData.db_user_room.joined = self.dbRoom.joined and 1 or 0
-	dbData.db_user_room.create_at = self.dbRoom.createAt
-	dbData.db_user_room.update_at = os.time()
+	-- dbData.db_user_room = {}
+	-- dbData.db_user_room.uid     = self.uid
+	-- dbData.db_user_room.roomid  = self.dbRoom.id
+	-- dbData.db_user_room.type    = self.dbRoom.type
+	-- dbData.db_user_room.mode    = self.dbRoom.mode
+	-- dbData.db_user_room.created = self.dbRoom.isCreated and 1 or 0
+	-- dbData.db_user_room.joined = self.dbRoom.joined and 1 or 0
+	-- dbData.db_user_room.create_at = self.dbRoom.createAt
+	-- dbData.db_user_room.update_at = os.time()
 end
 
-function cls:on_enter( ... )
+function _M:on_enter( ... )
 	-- body
 	local D = self.dbRoom
 	if D.joined then
@@ -72,7 +72,7 @@ function cls:on_enter( ... )
 	client.push(self, 'room_info', res)
 end
 
-function cls:on_exit( ... )
+function _M:on_exit( ... )
 	-- body
 	local D = self.room
 	if D.joined and D.online then
@@ -83,7 +83,7 @@ function cls:on_exit( ... )
 	end
 end
 
-function cls:on_func_open()
+function _M:on_func_open()
 	-- body
 	local uid = self.agentContext.uid
 	local index = self.context:get_entity_index(UserComponent)
@@ -103,7 +103,7 @@ end
 
 
 
-function cls:match(args)
+function _M:match(args)
 	-- body
 	
 	local res = {}
@@ -125,7 +125,7 @@ function cls:match(args)
 	return res
 end
 
-function cls:create(args)
+function _M:create(args)
 	-- body
 	if self.dbRoom.isCreated then
 		local res = {}
@@ -148,7 +148,7 @@ function cls:create(args)
 	return res
 end
 
-function cls:join(args)
+function _M:join(args)
 	-- body
 	if self.dbRoom.isCreated then
 		if self.dbRoom.id ~= args.roomid then
@@ -183,7 +183,7 @@ function cls:join(args)
 	end
 end
 
-function cls:rejoin()
+function _M:rejoin()
 	-- body
 	local uid   = self.agentContext.uid
 	local agent = skynet.self()
@@ -216,7 +216,7 @@ function cls:rejoin()
 end
 
 -- called by client
-function cls:leave()
+function _M:leave()
 	-- body
 	log.info('RoomSystem leave')
 	local uid   = self.agentContext.uid
@@ -238,7 +238,7 @@ function cls:leave()
 end
 
 -- called by room
-function cls:roomover()
+function _M:roomover()
 	-- body
 	self.dbRoom.id = 0
 	self.dbRoom.joined = false
@@ -246,7 +246,7 @@ function cls:roomover()
 	return true
 end
 
-function cls:forward_room(name, args)
+function _M:forward_room(name, args)
 	-- body
 	if self.dbRoom.joined then
 		local cmd = "on_"..name
@@ -260,7 +260,7 @@ function cls:forward_room(name, args)
 	end
 end
 
-function cls:forward_room_rsp(name, args)
+function _M:forward_room_rsp(name, args)
 	-- body
 	if self.dbRoom.joined then
 		local cmd = name
@@ -270,4 +270,4 @@ function cls:forward_room_rsp(name, args)
 	end
 end
 
-return cls
+return _M

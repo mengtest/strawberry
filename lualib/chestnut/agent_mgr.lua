@@ -12,11 +12,23 @@ end
 
 local _M = {}
 
-function _M.call_enter( ... )
+function _M.enter(uid)
     -- body
     local handle = get_address()
     assert(handle)
-    return skynet.call(handle, 'enter', ...)
+    return skynet.call(handle, 'enter', uid)
+end
+
+function _M.exit(uid)
+    local handle = get_address()
+    assert(handle)
+    return skynet.call(handle, 'exit', uid)
+end
+
+function _M.exit_at_once(uid)
+    local handle = get_address()
+    assert(handle)
+    return skynet.call(handle, 'exit_at_once', uid)
 end
 
 return _M

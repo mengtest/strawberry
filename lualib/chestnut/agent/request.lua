@@ -2,6 +2,7 @@ local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
 local time_utils = require "common.utils"
 local logout = require "chestnut.agent.logout"
+local AgentSystems = require 'chestnut.agent.AgentSystems'
 local servicecode = require "enum.servicecode"
 local client = require "client"
 local pcall = pcall
@@ -20,13 +21,12 @@ function REQUEST:handshake()
 end
 
 function REQUEST:enter()
-	-- body
-	log.info('test enter')
-	local ok, err = xpcall(AgentSystems.on_enter, traceback, self)
+	local ok, err = xpcall(AgentSystems.on_enter, traceback, self.obj)
 	if not ok then
 		log.error(err)
+		return { errorcode = 1 }
 	end
-	return { errorcode = 1 }
+	return { errorcode = 0 }
 end
 
 function REQUEST:logout()
@@ -42,8 +42,6 @@ end
 
 ------------------------------------------
 -- 系统模块
-
-
 function REQUEST:first(args)
 	-- body
 	local ok, err = pcall(self.systems.user.first, self.systems.user, args)

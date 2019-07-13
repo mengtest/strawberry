@@ -85,11 +85,13 @@ function _M:write_user(db_user)
 	if res.errno then
 		log.error('%s', self.dump(res))
 	end
-	return res
 end
 
 function _M:write_user_room(db_user_room)
 	-- body
+	if not db_user_room then
+		return
+	end
 	local sql = string_format([==[CALL
 	sp_user_room_insert_or_update(%d, %d, %d, %d, %d, %d, %d, %d);]==],
 	db_user_room.uid, db_user_room.roomid, db_user_room.created, db_user_room.joined,
@@ -99,11 +101,12 @@ function _M:write_user_room(db_user_room)
 		log.error(sql)
 		log.error('%s', self.dump(res))
 	end
-	return true
 end
 
 function _M:write_user_package(db_user_package)
-	-- body
+	if not db_user_package then
+		return
+	end
 	for _,db_user_item in ipairs(db_user_package) do
 		local sql = string_format([==[CALL
 		sp_user_package_insert_or_update(%d, %d, %d, %d, %d);]==],
@@ -115,11 +118,12 @@ function _M:write_user_package(db_user_package)
 			return false
 		end
 	end
-	return true
 end
 
 function _M:write_user_funcopen(db_user_funcopens)
-	-- body
+	if not db_user_funcopens then
+		return
+	end
 	for _,db_user_funcitem in ipairs(db_user_funcopens) do
 		local sql = string_format([==[CALL
 		sp_user_funcopen_insert_or_update(%d, %d, %d, %d, %d);]==],
@@ -132,7 +136,24 @@ function _M:write_user_funcopen(db_user_funcopens)
 			return false
 		end
 	end
-	return true
+end
+
+function _M:write_user_achievement(data)
+	if not data then
+		return
+	end
+	for _,item in ipairs(data) do
+		local sql = string_format([==[CALL
+		sp_user_achievement_insert_or_update(%d, %d, %d, %d, %d, %d);]==],
+		item.uid, item.id, item.reach, item.recv,
+		item.create_at, item.update_at)
+		-- log.info(sql)
+		local res = self.db:query(sql)
+		if res.errno then
+			log.error('%s', self.dump(res))
+			return false
+		end
+	end
 end
 
 ------------------------------------------

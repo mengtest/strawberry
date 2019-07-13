@@ -100,10 +100,13 @@ skynet.register_protocol {
 			if ok then
 				if result then
 					if login_type == 'so' then
+						log.info('send response')
 						send_package_id(fd, result)
 					else
 						send_package_gate(fd, result)
 					end
+				else
+					log.error('result is nil')
 				end
 			else
 				log.error("agent dispatch error:")

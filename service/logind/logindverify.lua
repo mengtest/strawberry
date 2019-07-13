@@ -78,7 +78,7 @@ local function auth_win_myself(username, password)
 			local city     = "Beijing"
 			local country  = "CN"
 			local headimg  = "xx"
-			new_user(uid, sex, nickname, province, city, country, headimg, 0)
+			-- new_user(uid, sex, nickname, province, city, country, headimg, 0)
 		end
 		return uid
 	else
@@ -94,7 +94,7 @@ local function auth_win_myself(username, password)
 		local headimg  = "xx"
 
 		new_account(username, password, uid)
-		new_user(uid, sex, nickname, province, city, country, headimg, 0)
+		-- new_user(uid, sex, nickname, province, city, country, headimg, 0)
 		return uid
 	end
 end

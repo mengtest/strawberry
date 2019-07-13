@@ -1,6 +1,4 @@
 ﻿#include "xloggerdd.h"
-#include "xlog.h"
-
 #include "list.h"
 
 #include <stdio.h>
@@ -29,14 +27,17 @@
 #define DEFAULT_ROLL_SIZE (128*ONE_MB)		// ��־�ļ��ﵽ512M������һ�����ļ�
 #define DEFAULT_PATH      ("logs")
 #define DEFAULT_INTERVAL  (5)			    // ��־ͬ�������̼��ʱ��
-#define MALLOC malloc
-#define FREE   free
 
 struct xloggerdd {
-	char path[XLOG_MAXPATHLEN];
+	int initd;
+	char basepath[XLOG_MAXPATHLEN];
 	logger_level loglevel;  // 在這之上才落地
+	time_t pt;              // 开始七点
 	size_t rollsize;        // �ļ����ʱ�����
-	size_t allocsize;
+	size_t allocsize;       // 统计内存大小
+	size_t freesize;
+	size_t mocksize;
+	size_t wirtesize;
 	FILE* handle[LOG_MAX];
 	size_t written_bytes[LOG_MAX];	// ��д���ļ����ֽ���
 	struct list_head head;  // 所有的
@@ -87,95 +88,40 @@ check_and_create_dir_(char *fullpath, int count) {
 	return XLOG_ERR_EXISTS_DIR;
 }
 
-static int
-check_and_create_date_dir(const char *basepath, int basepathcount, char *datepath, int datepathcount, int *sz) {
-	time_t cs = time(NULL);
-	struct tm *tm = localtime(&cs);
-	assert(tm != NULL);
-
-	char timebuf[32] = { 0 };
-	strftime(timebuf, sizeof(timebuf), "%Y%m%d", tm);
-#if defined(_MSC_VER)
-	*sz = snprintf(datepath, datepathcount, "%s\\%s", basepath, timebuf);
-#else
-	*sz = snprintf(datepath, datepathcount, "%s/%s", basepath, timebuf);
-#endif
-	return check_and_create_dir_(datepath, *sz);
-}
-
+// basepath + filename.log
 static size_t
-get_filename(char *datepath, int count, logger_level level, char *filename, size_t filename_count) {
+get_filename(char *basepath, int count, logger_level level, char *ofilename, size_t fhint) {
+	assert(basepath != NULL);
 	assert(level >= LOG_DEBUG && level < LOG_MAX);
-	assert(filename != NULL);
-	memset(filename, 0, count);
+	assert(ofilename != NULL);
 
 	time_t cs = time(NULL);
-	struct tm *tm = localtime(&cs);
-	assert(tm != NULL);
 
-	// char timebuf[32] = { 0 };
-	// strftime(timebuf, sizeof(timebuf), "%Y%m%d", tm);
 #if defined(_MSC_VER)
 	if (level == LOG_DEBUG) {
-		snprintf(filename, filename_count, "%s\\%llu-%s.log", datepath, cs, "debug");
+		return snprintf(ofilename, fhint, "%s\\%llu-%s.log", basepath, cs, "debug");
 	} else if (level == LOG_INFO) {
-		snprintf(filename, filename_count, "%s\\%llu-%s.log", datepath, cs, "info");
+		return snprintf(ofilename, fhint, "%s\\%llu-%s.log", basepath, cs, "info");
 	} else if (level == LOG_WARNING) {
-		snprintf(filename, filename_count, "%s\\%llu-%s.log", datepath, cs, "warning");
+		return snprintf(ofilename, fhint, "%s\\%llu-%s.log", basepath, cs, "warning");
 	} else if (level == LOG_ERROR) {
-		snprintf(filename, filename_count, "%s\\%llu-%s.log", datepath, cs, "error");
+		return snprintf(ofilename, fhint, "%s\\%llu-%s.log", basepath, cs, "error");
 	} else if (level == LOG_FATAL) {
-		snprintf(filename, filename_count, "%s\\%llu-%s.log", datepath, cs, "fatal");
+		return snprintf(ofilename, fhint, "%s\\%llu-%s.log", basepath, cs, "fatal");
 	}
 #else
 	if (level == LOG_DEBUG) {
-		snprintf(filename, filename_count, "%s/%llu-%s.log", datepath, cs, "debug");
+		return snprintf(ofilename, fhint, "%s/%llu-%s.log", basepath, cs, "debug");
 	} else if (level == LOG_INFO) {
-		snprintf(filename, filename_count, "%s/%llu-%s.log", datepath, cs, "info");
+		return snprintf(ofilename, fhint, "%s/%llu-%s.log", basepath, cs, "info");
 	} else if (level == LOG_WARNING) {
-		snprintf(filename, filename_count, "%s/%llu-%s.log", datepath, cs, "warning");
+		return snprintf(ofilename, fhint, "%s/%llu-%s.log", basepath, cs, "warning");
 	} else if (level == LOG_ERROR) {
-		snprintf(filename, filename_count, "%s/%llu-%s.log", datepath, cs, "error");
+		return snprintf(ofilename, fhint, "%s/%llu-%s.log", basepath, cs, "error");
 	} else if (level == LOG_FATAL) {
-		snprintf(filename, filename_count, "%s/%llu-%s.log", datepath, cs, "fatal");
+		return snprintf(ofilename, fhint, "%s/%llu-%s.log", basepath, cs, "fatal");
 	}
 #endif
-	return strlen(filename);
-}
-
-static int
-check_file(const char *datepath, logger_level loglevel) {
-	char fullpath[XLOG_MAXPATHLEN] = { 0 };
-	int i = loglevel;
-	for (; i < LOG_MAX; i++) {
-		// create
-		memset(fullpath, 0, XLOG_MAXPATHLEN);
-		size_t len = get_filename(datepath, strlen(datepath), i, fullpath, XLOG_MAXPATHLEN);
-		assert(len > 0);
-
-		FILE *f = fopen(fullpath, "w+");
-		if (f == NULL) {
-#ifdef _MSC_VER
-			DWORD dw = GetLastError();
-			char buffer[128] = { 0 };
-			if (FormatMessage(FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_SYSTEM,
-				NULL,
-				dw,
-				0,
-				buffer,
-				sizeof(buffer) / sizeof(char),
-				NULL)) {
-				fprintf(stderr, "open file error: %s\n", buffer);
-			}
-#else
-			fprintf(stderr, "open file error: %s\n", strerror(errno));
-#endif // _MSC_VER
-			return XLOG_ERR_OPEN;
-		} else {
-			fclose(f);
-		}
-	}
-	return XLOG_OK;
 }
 
 /*
@@ -210,7 +156,7 @@ check_dir(const char *path, char *basepath, int *sz) {
 		}
 		dir[j][k++] = t;
 	}
-	
+
 	for (i = 0, k = 0; i <= j; i++) {
 		len = strlen(dir[i]);
 		memcpy(basepath + k, dir[i], len);
@@ -233,15 +179,37 @@ check_dir(const char *path, char *basepath, int *sz) {
 	return XLOG_OK;
 }
 
+static size_t
+xloggerdd_gen_dir_(struct xloggerdd *self, char *fullpath, size_t hint) {
+	if (fullpath == NULL) {
+		return 0;
+	}
+	char path[XLOG_MAXPATHLEN] = { 0 };
+	size_t sz = 0;
+	struct tm *ntm = localtime(&self->pt);
+	char timebuf[32] = { 0 };
+	strftime(timebuf, sizeof(timebuf), "%Y%m%d", ntm);
+#if defined(_MSC_VER)
+	sz = snprintf(path, XLOG_MAXPATHLEN, "%s\\%s", self->basepath, timebuf);
+#else
+	sz = snprintf(path, XLOG_MAXPATHLEN, "%s/%s", self->basepath, timebuf);
+#endif
+
+	strncpy(fullpath, path, sz);
+	return sz;
+}
 
 static int
-xloggerdd_init_(struct xloggerdd *self, const char *datepath) {
-	char fullpath[XLOG_MAXPATHLEN] = { 0 };
+xloggerdd_init_(struct xloggerdd *self) {
+
 	int i = self->loglevel;
 	for (; i < LOG_MAX; i++) {
 		// create
-		memset(fullpath, 0, XLOG_MAXPATHLEN);
-		size_t len = get_filename(datepath, strlen(datepath), i, fullpath, XLOG_MAXPATHLEN);
+		char path[XLOG_MAXPATHLEN] = { 0 };
+		size_t psz = xloggerdd_gen_dir_(self, path, XLOG_MAXPATHLEN);
+
+		char fullpath[XLOG_MAXPATHLEN] = { 0 };
+		size_t len = get_filename(path, psz, i, fullpath, XLOG_MAXPATHLEN);
 		assert(len > 0);
 
 		if (self->handle[i] == NULL) {
@@ -271,7 +239,7 @@ xloggerdd_init_(struct xloggerdd *self, const char *datepath) {
 }
 
 struct xloggerdd *
-xloggerdd_create(const char *path, logger_level loglevel, size_t rollsize) {
+	xloggerdd_create(const char *path, logger_level loglevel, size_t rollsize) {
 	// check path
 	int sz = 0;
 	char basepath[XLOG_MAXPATHLEN] = { 0 };
@@ -279,43 +247,27 @@ xloggerdd_create(const char *path, logger_level loglevel, size_t rollsize) {
 		fprintf(stderr, "path is wrong\n");
 		return NULL;
 	}
-	char datepath[XLOG_MAXPATHLEN] = { 0 };
-	int datepathsz = 0;
-	int err = check_and_create_date_dir(basepath, sz, datepath, XLOG_MAXPATHLEN, &datepathsz);
-	if (err > XLOG_ERR_EXISTS_DIR) {
-		fprintf(stderr, "datepath is wrong\n");
+	// check loglevel
+	if (loglevel < LOG_DEBUG || loglevel > LOG_FATAL) {
 		return NULL;
 	}
-	if (check_file(datepath, loglevel)) {
-		fprintf(stderr, "open file failture\n");
-		return NULL;
+	// check rollsize
+	if (rollsize > 0) {
+		rollsize = rollsize * ONE_MB;
+	} else {
+		rollsize = DEFAULT_ROLL_SIZE;
 	}
-	if (loglevel < LOG_DEBUG || loglevel >= LOG_MAX) {
-		fprintf(stderr, "logleve is %d\n", loglevel);
-		return NULL;
-	}
-	if (path != NULL && strlen(path) >= XLOG_MAXPATHLEN) {
-		fprintf(stderr, "path len more than %d\n", XLOG_MAXPATHLEN);
-		return NULL;
-	}
+	// create
 	struct xloggerdd *inst = (struct xloggerdd *)MALLOC(sizeof(*inst));
 	memset(inst, 0, sizeof(*inst));
+	strncpy(inst->basepath, basepath, strlen(basepath));
 	inst->loglevel = loglevel;
-	if (rollsize > 0) {
-		inst->rollsize = rollsize * ONE_MB;
-	} else {
-		inst->rollsize = DEFAULT_ROLL_SIZE;
-	}
-	
-	if (path == NULL)
-		strncpy(inst->path, DEFAULT_PATH, strlen(DEFAULT_PATH));
-	else {
-		strncpy(inst->path, basepath, strlen(basepath));
-	}
+	inst->rollsize = rollsize;
 
 	INIT_LIST_HEAD(&inst->head);
 
-	xloggerdd_init_(inst, datepath);
+	xloggerdd_check_date(inst);
+	inst->initd = 1;
 	return inst;
 }
 
@@ -334,7 +286,7 @@ xloggerdd_release(struct xloggerdd *self) {
 	FREE(self);
 }
 
-int 
+int
 xloggerdd_log(struct xloggerdd *self, logger_level level, const char *buf, size_t len) {
 	if (len <= 0 || buf == NULL) {
 		return XLOG_ERR_PARAM;
@@ -348,14 +300,8 @@ xloggerdd_log(struct xloggerdd *self, logger_level level, const char *buf, size_
 	request->size = len;
 	memcpy(request->buffer, buf, len);
 	self->allocsize += allocsz;
-	xloggerdd_push(self, request);
-	return XLOG_OK;
-}
-
-int
-xloggerdd_push(struct xloggerdd *self, struct xlogger_append_request *request) {
 	list_add_tail(&request->head, &self->head);
-	return 0;
+	return XLOG_OK;
 }
 
 int
@@ -370,7 +316,7 @@ xloggerdd_flush(struct xloggerdd *self) {
 		}
 		assert(request->level >= LOG_DEBUG && request->level < LOG_MAX);
 		FILE *f = self->handle[request->level];
-		if (f == NULL || f == stdout) {
+		if (f == NULL) {
 			FREE(request);
 			continue;
 		}
@@ -384,6 +330,9 @@ xloggerdd_flush(struct xloggerdd *self) {
 			nbytes += nn;
 		}
 		self->written_bytes[request->level] += nbytes;
+		self->wirtesize += nbytes;
+		self->freesize += sizeof(struct xlogger_append_request) + request->size;
+		self->mocksize += sizeof(struct xlogger_append_request) + nbytes;
 		FREE(request);
 	}
 	INIT_LIST_HEAD(&self->head);
@@ -396,18 +345,18 @@ xloggerdd_flush(struct xloggerdd *self) {
 		}
 		fflush(f);
 	}
-	return 0;
+	return XLOG_OK;
 }
 
 int
 xloggerdd_check_roll(struct xloggerdd *self) {
-	// 日期到了
-    char datepath[XLOG_MAXPATHLEN] = { 0 };
-	int sz = 0;
-	if (!check_and_create_date_dir(self->path, strlen(self->path), datepath, XLOG_MAXPATHLEN, &sz)) {
-		// 没有并且创建了,初始新文件
-		xloggerdd_init_(self, datepath);
+	// check self
+	if (self == NULL) {
+		return XLOG_ERR_PARAM;
 	}
+	/*if (self->initd == 0) {
+		return XLOG_NOT_INITED;
+	}*/
 
 	// check roll
 	int i = self->loglevel;
@@ -422,6 +371,49 @@ xloggerdd_check_roll(struct xloggerdd *self) {
 			self->handle[i] = NULL;
 		}
 	}
-	xloggerdd_init_(self, datepath);
+	// 获得文件
+	xloggerdd_init_(self);
+	return XLOG_OK;
+}
+
+int
+xloggerdd_check_date(struct xloggerdd *self) {
+	// 日期到了
+	time_t cs = time(NULL);
+	if (cs == self->pt) {
+		return XLOG_OK;
+	}
+	struct tm *ltm = localtime(&self->pt);
+	struct tm *tm = localtime(&cs);
+	if (tm->tm_year == ltm->tm_year && tm->tm_yday == tm->tm_yday) {
+		if (self->initd == 0) {
+			goto entry;
+		}
+		return XLOG_OK;
+	}
+entry:
+	self->pt = cs;
+	// 关掉所有文件
+	int i = self->loglevel;
+	for (; i < LOG_MAX; i++) {
+		FILE *f = self->handle[i];
+		if (f == NULL) {
+			continue;
+		}
+		fclose(f);
+		self->handle[i] = NULL;
+	}
+
+	// 获取日期文件夹
+	char path[XLOG_MAXPATHLEN] = { 0 };
+	size_t sz = xloggerdd_gen_dir_(self, path, XLOG_MAXPATHLEN);
+
+	int err = check_and_create_dir_(path, XLOG_MAXPATHLEN);
+	if (err > XLOG_ERR_EXISTS_DIR) {
+		fprintf(stderr, "datepath is wrong\n");
+		return err;
+	}
+	// 获得文件
+	xloggerdd_init_(self);
 	return XLOG_OK;
 }

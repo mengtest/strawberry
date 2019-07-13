@@ -5,6 +5,7 @@ local skynet_queue = require "skynet.queue"
 local queue = require "chestnut.queue"
 local util = require "common.utils"
 local service = require "service"
+local servicecode = require "enum.servicecode"
 local traceback = debug.traceback
 local assert = assert
 local cs = skynet_queue()
@@ -82,7 +83,7 @@ function CMD.exit_at_once(uid)
 	agents[u.addr] = cnt - 1
 	cs(enqueue, u)
 	users[uid] = nil
-	return true
+	return servicecode.SUCCESS
 end
 
 service.init {

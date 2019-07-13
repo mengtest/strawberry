@@ -1,7 +1,11 @@
 local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
+local db_read = require "db.db_read"
+local db_write = require "db.db_write"
+local util = require 'db.util'
 local address
-local _M = {}
+local ctx
+local QUERY = {}
 
 local function get_address()
     if not address then
@@ -9,6 +13,112 @@ local function get_address()
     end
     return address
 end
+
+function QUERY.start( ... )
+	-- body
+	local db = util.connect_mysql()
+	ctx = { db=db, dump= util.dump }
+end
+
+function QUERY.close()
+	-- body
+	util.disconnect_mysql(db)
+end
+
+function QUERY.kill()
+	-- body
+	skynet.exit()
+end
+
+------------------------------------------
+-- read data
+function QUERY.read_sysmail()
+	-- body
+	local res = db_read.read_sysmail(ctx)
+	return res
+end
+
+function QUERY.read_account_by_username(username, password)
+	-- body
+	local res = {}
+	local accounts = db_read.read_account_by_username(ctx, username, password)
+	if #accounts == 1 then
+		local users = db_read.read_users_by_uid(ctx, accounts[1].uid)
+		res.accounts = accounts
+		res.users = users
+	end
+	return res
+end
+
+function QUERY.read_user(uid)
+	-- body
+	local res = {}
+	res.db_users = db_read.read_users_by_uid(ctx, uid)
+	res.db_user_rooms = db_read.read_user_rooms(ctx, uid)
+	res.db_user_packages = db_read.read_user_packages(ctx, uid)
+	res.db_user_funcopens = db_read.read_user_funcopens(ctx, uid)
+	return res
+end
+
+function QUERY.read_room_mgr()
+	-- body
+	local res = {}
+	res.db_users = db_read.read_room_mgr_users(ctx)
+	res.db_rooms = db_read.read_room_mgr_rooms(ctx)
+	return res
+end
+
+function QUERY.read_room(id)
+	-- body
+	local res = {}
+	res.db_rooms = db_read.read_room(ctx, id)
+	res.db_users = db_read.read_room_users(ctx, id)
+	return res
+end
+
+------------------------------------------
+-- 写数据
+function QUERY.write_account(db_account)
+	db_write.write_account(ctx, db_account)
+end
+
+function QUERY.write_union(db_union)
+	-- body
+end
+
+function QUERY.write_user(data)
+	-- body
+	db_write.write_user(ctx, data.db_user)
+	db_write.write_user_room(ctx, data.db_user_room)
+	db_write.write_user_package(ctx, data.db_user_package)
+    db_write.write_user_funcopen(ctx, data.db_user_funcopens)
+    db_write.write_user_achievement(ctx, data.db_user_achievements)
+end
+
+function QUERY.write_room_mgr(data)
+	-- body
+	db_write.write_room_mgr_users(ctx, data.db_users)
+	db_write.write_room_mgr_rooms(ctx, data.db_rooms)
+end
+
+function QUERY.write_room(data)
+	-- body
+	db_write.write_room_users(ctx, data.db_users)
+	db_write.write_room(ctx, data.db_room)
+end
+
+------------------------------------------
+-- 修改离线数据
+function QUERY.write_offuser_room(db_user_room)
+	-- body
+	db_write.write_offuser_room_created(ctx, db_user_room)
+end
+
+-------------------------------------------------------------end
+
+local _M = {}
+
+_M.host = QUERY
 
 function _M.read_sysmail( ... )
     -- body

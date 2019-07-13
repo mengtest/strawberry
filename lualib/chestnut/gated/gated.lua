@@ -110,6 +110,7 @@ end
 
 -- call by self (when socket disconnect)
 function server.disconnect_handler(username, fd)
+	skynet.error(string.format('fd(%d) disconnect', fd))
 	local u = username_map[username]
 	if u then
 		if u.online then

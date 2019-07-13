@@ -120,18 +120,17 @@ function _M.logout(uid)
 	save_data(uid)
 
 	-- 断线重连
-	if true then
+	if false then
 		obj.logined = false
 		obj.authed = false
 		return skynet.call(".AGENT_MGR", "lua", "exit", obj.uid)
 	else
-		local ok = skynet.call(".AGENT_MGR", "lua", "exit_at_once", obj.uid)
-		if not ok then
-			log.error("call agent_mgr exit_at_once failture.")
-			return servicecode.FAIL
+		local err = skynet.call(".AGENT_MGR", "lua", "exit_at_once", obj.uid)
+		if err == servicecode.SUCCESS then
+			objmgr.del(obj)
+			log.info("uid(%d) agent logout", obj.uid)
 		end
-		objmgr.del(obj)
-		log.info("uid(%d) agent logout", obj.uid)
+		return err
 	end
 	return servicecode.SUCCESS
 end

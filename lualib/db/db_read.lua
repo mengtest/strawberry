@@ -10,6 +10,19 @@ function _M:read_sysmail()
 	return res
 end
 
+function _M:read_account_by_username(username, password)
+	-- body
+	local res = self.db:query(string.format("CALL sp_account_select('%s', '%s');", username, password))
+	if res.errno then
+		log.error('%s', self.dump(res))
+		return {}
+	end
+	if res.multiresultset then
+		return res[1]
+	end
+	return {}
+end
+
 function _M:read_room_mgr_users()
 	-- body
 	local res = self.db:query("CALL sp_room_mgr_users_select();")
@@ -34,19 +47,6 @@ function _M:read_room_mgr_rooms()
 		return res[1]
 	end
 	return res
-end
-
-function _M:read_account_by_username(username, password)
-	-- body
-	local res = self.db:query(string.format("CALL sp_account_select('%s', '%s');", username, password))
-	if res.errno then
-		log.error('%s', self.dump(res))
-		return {}
-	end
-	if res.multiresultset then
-		return res[1]
-	end
-	return {}
 end
 
 function _M:read_room(id)

@@ -2,7 +2,7 @@ local skynet = require "skynet"
 local client = require "client"
 local service = require "service"
 local command = require 'command'
-require "chestnut.agent.AgentContext"
+require "chestnut.agent.context"
 require "chestnut.agent.request"
 require "chestnut.agent.response"
 local traceback = debug.traceback

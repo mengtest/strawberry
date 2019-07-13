@@ -1,27 +1,30 @@
+local skynet = require 'skyenet'
 local ds = require "skynet.datasheet"
 local log = require "chestnut.skynet.log"
 local client = require "client"
-local luaTableDump = require "luaTableDump"
+local table_dump = require "luaTableDump"
 local table_insert = table.insert
-
 local _M = {}
+local funcopen_config
 
-function _M:on_data_init(dbData)
+skynet.init(function ()
+
+end)
+
+function _M:on_data_init(db_data)
 	-- body
 	log.info(luaTableDump(dbData))
-	assert(dbData ~= nil)
-	-- assert(dbData.db_user_funcopens ~= nil and #dbData.db_user_funcopens > 0)
-
-	-- local funcs = {}
-	-- for _,db_item in pairs(dbData.db_user_funcopens) do
-	-- 	local item = {}
-	-- 	item.id = assert(db_item.id)
-	-- 	item.open = assert(db_item.open)
-	-- 	item.createAt = assert(db_item.create_at)
-	-- 	item.updateAt = assert(db_item.update_at)
-	-- 	funcs[tonumber(item.id)] = item
-	-- end
-	-- self.dbFuncopen = funcs
+	self.mod_funcopen = {}
+	local funcs = {}
+	for _,db_item in pairs(dbData.db_user_funcopens) do
+		local item = {}
+		item.id = assert(db_item.id)
+		item.open = assert(db_item.open)
+		item.createAt = assert(db_item.create_at)
+		item.updateAt = assert(db_item.update_at)
+		funcs[tonumber(item.id)] = item
+	end
+	self.dbFuncopen = funcs
 end
 
 function _M:on_data_save(dbData)
@@ -52,7 +55,6 @@ end
 function _M:on_exit()
 	-- body
 end
-
 
 function _M:on_level_open()
 	-- body

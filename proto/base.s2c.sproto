@@ -39,7 +39,7 @@ offline 4 {
 # 系统模块 [100, 500)
 base_info 101 {
     request {
-        num       0 : integer
+        num      0 : integer
         nickname 1 : string
         nameid 2 : string
         rcard 3 : integer

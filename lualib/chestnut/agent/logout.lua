@@ -5,7 +5,7 @@ local log = require "chestnut.skynet.log"
 
 local _M = {}
 
-function _M.logout(obj, ... )
+function _M.logout(obj)
     -- body
     assert(obj.authed)
 	if obj.authed then

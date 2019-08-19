@@ -186,7 +186,8 @@ function server.start(conf)
 
 	function handler.open(source, gateconf)
 		local servername = assert(gateconf.servername)
-		return conf.register_handler(servername)
+		local gated = assert(gateconf.gated)
+		return conf.register_handler(servername, gated)
 	end
 
 	function handler.connect(fd, addr)
@@ -329,9 +330,8 @@ function server.start(conf)
 				-- new pack
 				p = { fd }
 				u.response[session] = p
-				print("************************abced1")
 				local ok, result = pcall(conf.request_handler, u.username, message)
-				print("***********abced2", ok, "lenght of result is", #result)
+				
 				-- NOTICE: YIELD here, socket may close.
 				result = result or ""
 				if not ok then

@@ -4,6 +4,7 @@ local crypt = require "skynet.crypt"
 local httpsc = require "http.httpc"
 local log = require "chestnut.skynet.log"
 local guid = require "guid"
+local dbc = require 'db.db'
 
 local NORET = {}
 local server_win = { ["sample1"] = true }
@@ -22,7 +23,7 @@ local function new_account(username, password, uid)
 	account.username = username
 	account.password = password
 	account.uid = uid
-	skynet.call(".DB", "lua", "write_new_account", account)
+	dbc.write_account(account)
 end
 
 local function new_unionid(unionid, uid)
@@ -31,7 +32,7 @@ local function new_unionid(unionid, uid)
 	local db_union = {}
 	db_union.unionid = unionid
 	db_union.uid = uid
-	skynet.call(".DB", "lua", "write_new_union", db_union)
+	dbc.write_union(db_union)
 end
 
 local function new_user(uid, sex, nickname, province, city, country, headimg, openid)
@@ -52,19 +53,15 @@ local function new_user(uid, sex, nickname, province, city, country, headimg, op
 	user.login_at       = os.time()
 	user.new_user       = 1
 	user.level          = 1
-	skynet.call(".DB", "lua", "write_new_user", user)
+	dbc.write_user(user)
 end
 
 -- @breif 账号登陆 username => uid
 local function auth_win_myself(username, password)
 	-- body
-	print(username, password)
 	assert(type(username) == 'string' and #username > 0)
 	assert(type(password) == 'string' and #password > 0)
-	local res = skynet.call(".DB", "lua", "read_account_by_username", username, password)
-	for k,v in pairs(res) do
-		print(k,v)
-	end
+	local res = dbc.read_account_by_username(username, password)
 	if type(res.accounts) == 'table' and #res.accounts == 1 then
 		local uid = res.accounts[1].uid
 		if #res.users <= 0 then
@@ -81,7 +78,7 @@ local function auth_win_myself(username, password)
 			local city     = "Beijing"
 			local country  = "CN"
 			local headimg  = "xx"
-			new_user(uid, sex, nickname, province, city, country, headimg, 0)
+			-- new_user(uid, sex, nickname, province, city, country, headimg, 0)
 		end
 		return uid
 	else
@@ -97,7 +94,7 @@ local function auth_win_myself(username, password)
 		local headimg  = "xx"
 
 		new_account(username, password, uid)
-		new_user(uid, sex, nickname, province, city, country, headimg, 0)
+		-- new_user(uid, sex, nickname, province, city, country, headimg, 0)
 		return uid
 	end
 end

@@ -1,29 +1,27 @@
 local skynet = require "skynet"
+local ds = require "skynet.datasheet"
+local log = require "chestnut.skynet.log"
+local client = require "client"
+local luaTableDump = require "luaTableDump"
+local table_insert = table.insert
 
-local cls = class("online")
+local _M = {}
 
-function cls:ctor(context, ... )
-	-- body
-	cls.super.ctor(self, context)
-
-	return self
-end
-
-function cls:login()
+function _M:login()
 	-- body
 	local uid = self.context.uid
 	local subid = self.context.subid
 	local ok = skynet.call(".ONLINE_MGR", "lua", "login", uid, subid, skynet.self())
 end
 
-function cls:logout()
+function _M:logout()
 	-- body
 	local uid = self.context.uid
 	local subid = self.context.subid
 	skynet.call(".ONLINE_MGR", "lua", "logout", uid, subid)
 end
 
-function cls:authed(args)
+function _M:authed(args)
 	-- body
 	local fd = assert(args.client)
 
@@ -33,7 +31,7 @@ function cls:authed(args)
 	skynet.call(".ONLINE_MGR", "lua", "authed", uid, subid, fd)
 end
 
-function cls:afk( ... )
+function _M:afk( ... )
 	-- body
 	local uid = self.context.uid
 	local subid = self.context.subid
@@ -41,4 +39,4 @@ function cls:afk( ... )
 	skynet.call(".ONLINE_MGR", "lua", "afk", uid, subid)
 end
 
-return cls
+return _M

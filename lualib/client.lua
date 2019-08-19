@@ -13,17 +13,19 @@ local host = sprotoloader.load(1):host "package"
 local send_request = host:attach(sprotoloader.load(2))
 local response_session = 0
 local response_session_name = {}
-
+local traceback = debug.traceback
 local version = 1
 local REQUEST = {}
 local RESPONSE = {}
+local login_type = 'so'
+local gate
+local _middlewares = {}
 
-local function request(name, args, response)
+local function request(obj, name, args, response)
 	log.info("agent request [%s]", name)
     local f = REQUEST[name]
-    if f then
-		local traceback = debug.traceback
-	    local ok, result = xpcall(f, traceback, ctx, args)
+    if f then		
+	    local ok, result = xpcall(f, traceback, obj, args)
 	    if ok then
 			if result then
 				return response(result)
@@ -53,30 +55,58 @@ local function response(session, args)
     end
 end
 
+local function send_package_id(id, pack)
+	-- body
+	assert(id and pack)
+	local package = string_pack(">s2", pack)
+	socket.send(id, package)
+end
+
+local function send_package_gate(fd, pack)
+	skynet.send(gate, "lua", "push_client", fd, pack)
+end
+
+local function get_name_by_session(session)
+	-- body
+	return response_session_name[session]
+end
+
+skynet.init(function ()
+end)
+
 skynet.register_protocol {
 	name = "client",
 	id = skynet.PTYPE_CLIENT,
 	unpack = function (msg, sz)
-		local msg, sz = skynet.unpack(msg, sz)
 		if sz > 0 then
 			return host:dispatch(msg, sz)
 		else
 			assert(false)
 		end
 	end,
-	dispatch = function (_, session, type, ...)
+	dispatch = function (fd, _, type, ...)
+		skynet.ignoreret()
 		if type == "REQUEST" then
-			local fd = session
-			local obj = objmgr.get_by_fd(fd)
+			-- local fd = session
+			local ctx = {}
+			local obj = assert(objmgr.get(fd))
+			ctx.obj = obj
+			assert(obj.fd == fd)
+			for _,v in pairs(_middlewares) do
+				v(ctx, ...)
+			end
 			local traceback = debug.traceback
-			local ok, result = xpcall(request, traceback, obj, ...)
+			local ok, result = xpcall(request, traceback, ctx, ...)
 			if ok then
 				if result then
 					if login_type == 'so' then
-						ctx:send_package(result)
+						log.info('send response')
+						send_package_id(fd, result)
 					else
-						ctx:send_package_gate("push_client", result)
+						send_package_gate(fd, result)
 					end
+				else
+					log.error('result is nil')
 				end
 			else
 				log.error("agent dispatch error:")
@@ -90,31 +120,24 @@ skynet.register_protocol {
 	end
 }
 
-local function send_package_id(id, pack)
-	-- body
-	assert(id and pack)
-	local package = string_pack(">s2", pack)
-	socket.write(id, package)
+local _M = {}
+
+function _M.init(mod)
 end
 
-local function send_package_gate(gate, fd, pack)
-	skynet.send(gate, "lua", "push_client", fd, pack)
-end
-
-local cls = {}
-
-function cls.init(mod)
-end
-
-function cls.request()
+function _M.request()
 	return REQUEST
 end
 
-function cls.response()
+function _M.response()
 	return RESPONSE
 end
 
-function cls.send_request(obj, name, args)
+function _M.use(middleware)
+	table.insert(_middlewares, middleware())
+end
+
+function _M.send_request(obj, name, args)
 	-- body
 	assert(obj.authed)
 	local fd = assert(obj.fd)
@@ -124,45 +147,32 @@ function cls.send_request(obj, name, args)
 	send_package_id(fd, request)
 end
 
-function cls.send_request_gate(obj, name, args)
+function _M.send_request_gate(obj, name, args)
 	-- body
 	assert(obj.authed)
 	response_session = response_session + 1 % max
 	response_session_name[response_session] = name
 	local request = send_request(name, args, self.response_session)
-	send_package_gate(obj.gate, obj.fd, request)
+	send_package_gate(obj.fd, request)
 end
 
-function cls:send_request(name, args)
+function _M.push(obj, name, args)
 	-- body
-	if not self.logined or not self.authed then
-		return
-	end
-	
-	self:send_request_id(fd, name, args)
-end
-
-function cls:push(name, args, ... )
-	-- body
-	if not self.logined or not self.authed then
-		return
-	end
+	assert(obj.authed)
 	assert(name)
-
-	local request = self._send_request(name, args, 0)
-	cls.send_package(self, request)
+	local fd = assert(obj.fd)
+	
+	if login_type == 'so' then
+		local request = send_request(name, args, 0)
+		send_package_id(obj.fd, request)
+	end
 end
 
-function cls.push2objs(objs, name, args, ... )
+function _M.push2objs(objs, name, args, ... )
 	-- body
 	for k,v in pairs(objs) do
-		cls.push(v, name, args, ...)
+		_M.push(v, name, args, ...)
 	end
 end
 
-function cls:get_name_by_session(session)
-	-- body
-	return self.response_session_name[session]
-end
-
-return cls
+return _M

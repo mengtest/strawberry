@@ -1,9 +1,11 @@
 local msgserver = require "chestnut.gated.msgserver"
 local crypt = require "skynet.crypt"
 local skynet = require "skynet"
+require 'skynet.manager'
 local log = require "chestnut.skynet.log"
 local servicecode = require "enum.servicecode"
 local gserver = require 'server'
+-- local client = require 'client'
 
 local loginservice = ".LOGIND"
 local servername
@@ -108,13 +110,16 @@ end
 
 -- call by self (when socket disconnect)
 function server.disconnect_handler(username, fd)
+	skynet.error(string.format('fd(%d) disconnect', fd))
 	local u = username_map[username]
 	if u then
 		if u.online then
 			log.info("call uid(%d) afk", u.uid)
-			skynet.call(u.agent, "lua", "afk", fd)
+			assert(u.fd == fd)
+			local agent = assert(u.agent)
+			skynet.call(agent, "lua", "afk", fd)
 		else
-			log.error('disconnet when onlien is false')
+			log.error('disconnet when online is false')
 		end
 	end
 end
@@ -124,16 +129,20 @@ function server.start_handler(username, fd, ... )
 	-- body
 	local u = username_map[username]
 	if u then
-		if u.online == nil or u.online == false then
+		if not u.online then
 			local agent = assert(u.agent)
 			local conf = {
 				uid = u.uid,
 				client = fd,
 			}
 			log.info("start_handler")
-			skynet.call(agent, "lua", "auth", conf)
-			u.online = true
-			u.fd = fd
+			local ok = skynet.call(agent, "lua", "auth", conf)
+			if ok then
+				u.online = true
+				u.fd = fd
+			else
+				log.error('auth error.')
+			end
 		else
 			log.error('online is true, start auth ...')
 		end
@@ -146,9 +155,9 @@ function server.msg_handler(username, msg, sz,... )
 	local u = username_map[username]
 	if u then
 		if u.online then
-			log.info('TEST MSG')
 			local agent = assert(u.agent)
-			skynet.redirect(agent, skynet.self(), "client", u.fd, msg, sz)
+			local fd = assert(u.fd)
+			skynet.redirect(agent, fd, "client", fd, msg, sz)
 		end
 	end
 end
@@ -160,13 +169,18 @@ function server.request_handler(username, msg)
 end
 
 -- call by self (when gate open)
-function server.register_handler(name)
-	skynet.error(string.format("reister gate server: %s", name))
+function server.register_handler(name, gated)
 	servername = name
-	local gated = skynet.getenv "gated"
-	gserver.call(loginservice, "lua", "register_gate", servername, skynet.self(), gated)
-	log.fields({ servername = servername }).info('register gated')
-	-- log.info('register gated')
+	assert(servername)
+	local address = '.gated_' .. servername
+	skynet.name(address, skynet.self())
+	gserver.host.register_service(address)
+
+	skynet.error(string.format("reister gate server: %s", servername))
+	local ok = gserver.call(loginservice, "lua", "register_gate", servername, address, gated)
+	if ok then
+		log.fields({ servername = servername }).info('register gated server ok.')
+	end
 end
 
 msgserver.start(server)

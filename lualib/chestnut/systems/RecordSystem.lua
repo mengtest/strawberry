@@ -3,33 +3,12 @@ local log = require "chestnut.skynet.log"
 local query = require "chestnut.query"
 local util = require "chestnut.time"
 local dbmonitor = require "dbmonitor"
+local client = require "client"
+local CH = client.request()
+local _M = {}
 
-local CLS_NAME = "recordmgr"
 
-local cls = class(CLS_NAME)
-
-function cls:ctor(context, ... )
-	-- body
-	cls.super.ctor(self, context)
-	self.agentContext = context
-	self.agentSystems = nil
-	self.dbRecord = nil
-	return self
-end
-
-function cls:on_data_init(dbData)
- 	-- body
-end
-
-function cls:on_data_save(dbData)
-end
-
-function cls:inituser( ... )
-	-- body
-	self:send_records()
-end
-
-function cls:send_records( ... )
+local function send_records(obj)
 	-- body
 	local l = {}
 	for _,v in pairs(self._mk) do
@@ -49,18 +28,32 @@ function cls:send_records( ... )
 	self.context:send_request("records", args)
 end
 
-function cls:send_record( ... )
+function _M:on_data_init(dbData)
+ 	-- body
+end
+
+function _M:on_data_save(dbData)
+end
+
+function _M:on_enter()
+	-- body
+	send_records(self)
+end
+
+
+
+function _M:send_record( ... )
 	-- body
 end
 
-function cls:add(item, ... )
+function _M:add(item, ... )
 	-- body
 	table.insert(self._data, mail)
 	self._count = self._count + 1
 	self._mk[item.id.value] = item
 end
 
-function cls:create(recordid, names, ... )
+function _M:create(recordid, names, ... )
 	-- body
 	local r = record.new(self._env, self._dbctx, self)
 	r.id.value = recordid
@@ -73,14 +66,14 @@ function cls:create(recordid, names, ... )
 	return r
 end
 
-function cls:add(mail, ... )
+function _M:add(mail, ... )
 	-- body
 	table.insert(self._data, mail)
 	self._count = self._count + 1
 	self._mk[mail.mailid.value] = mail
 end
 
-function cls:records(args, ... )
+function _M:records(args, ... )
 	-- body
 	local res = {}
 	res.errorcode = errorcode.SUCCESS
@@ -98,7 +91,7 @@ function cls:records(args, ... )
 	return res
 end
 
-function cls:record(recordid, names, ... )
+function _M:record(recordid, names, ... )
 	-- body
 	local i = record.new(self._env, self._dbctx, self)
 	i.uid.value = self._env._suid
@@ -111,4 +104,4 @@ function cls:record(recordid, names, ... )
 	i:insert_db()
 end
 
-return cls
+return _M

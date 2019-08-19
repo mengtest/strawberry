@@ -1,16 +1,19 @@
-local cls = class("chat")
+local skynet = require "skynet"
+local sd = require "skynet.sharedata"
+local snowflake = require "chestnut.snowflake"
+local log = require "chestnut.skynet.log"
+local zset = require "chestnut.zset"
+local query = require "chestnut.query"
+local sysmaild = require "sysmaild"
+local client = require "client"
+local CH = client.request()
+local _M = {}
 
-function cls:ctor(context, ... )
+skynet.init(function ()
 	-- body
-	assert(self)
-end
+end)
 
-function cls:set_agent_systems(systems, ... )
-	-- body
-	self.agentSystems = systems
-end
-
-function cls:on_data_init(dbData)
+function _M:on_data_init(dbData)
 	-- body
 	assert(dbData ~= nil)
 	assert(dbData.db_users ~= nil)
@@ -19,11 +22,11 @@ function cls:on_data_init(dbData)
 	return true
 end
 
-function cls:on_data_save(dbData, ... )
+function _M:on_data_save(dbData)
 	-- body
 	assert(dbData ~= nil)
 
 	return true
 end
 
-return cls
+return _M

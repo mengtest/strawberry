@@ -27,6 +27,7 @@ end
 
 local function loop()
 	while true do
+		logger:check()
 		logger:flush()
 		skynet.sleep(100 * 20)
 	end

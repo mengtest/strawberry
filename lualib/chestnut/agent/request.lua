@@ -2,32 +2,31 @@ local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
 local time_utils = require "common.utils"
 local logout = require "chestnut.agent.logout"
+local AgentSystems = require 'chestnut.agent.AgentSystems'
 local servicecode = require "enum.servicecode"
 local client = require "client"
-local AgentSystems = require "chestnut.agent.AgentSystems"
 local pcall = pcall
 local assert = assert
-
 local REQUEST = client.request()
+local traceback = debug.traceback
 
 function REQUEST:handshake()
 	-- body
-	local login_type = skynet.getenv 'login_type'
-	if login_type == 'so' then
-		self:send_request("handshake")
-	else
-		self:send_request_gate("handshake")
-	end
+	-- skynet.error('handshake')
+	local obj = self.obj
+	client.push(obj, 'handshake')
 	local res = {}
 	res.errorcode = 0
 	return res
 end
 
 function REQUEST:enter()
-	-- body
-	log.info('test enter')
-	AgentSystems.on_enter(self)
-	return { errorcode = 1 }
+	local ok, err = xpcall(AgentSystems.on_enter, traceback, self.obj)
+	if not ok then
+		log.error(err)
+		return { errorcode = 1 }
+	end
+	return { errorcode = 0 }
 end
 
 function REQUEST:logout()
@@ -43,8 +42,6 @@ end
 
 ------------------------------------------
 -- 系统模块
-
-
 function REQUEST:first(args)
 	-- body
 	local ok, err = pcall(self.systems.user.first, self.systems.user, args)

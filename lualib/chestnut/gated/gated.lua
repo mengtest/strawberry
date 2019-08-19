@@ -66,7 +66,7 @@ function server.logout_handler(source, uid, subid)
 	local u = users[uid]
 	if u then
 		log.info("call loginservice logout")
-		local err = skynet.call(loginservice, "lua", "logout", uid, subid)
+		local err = gserver.call(loginservice, "lua", "logout", uid, subid)
 		if err ~= servicecode.SUCCESS then
 			log.error("logind service logout failture.")
 		else

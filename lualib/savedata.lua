@@ -11,20 +11,21 @@ local subscribed = false
 local service = {}
 
 function service.init(mod)
-    address = skynet.uniqueservice("chestnut/refresh_mgr")
-    local channel_id = skynet.call(address, 'lua', 'get_channel_id')
+    address = skynet.uniqueservice("refresh_mgr")
+    local channel_id = skynet.call(address, "lua", "get_channel_id")
 
     local funcs = mod.command
-    channel = mc.new {
-		channel = channel_id,
-		dispatch = function (_, _, cmd, ...)
+    channel =
+        mc.new {
+        channel = channel_id,
+        dispatch = function(_, _, cmd, ...)
             -- body
             local f = assert(funcs[cmd])
             local ok, err = xpcall(f, traceback, ...)
             if not ok then
                 log.error(" sub [%s] error = [%s]", cmd, err)
             end
-		end
+        end
     }
     inited = true
 end

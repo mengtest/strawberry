@@ -1,9 +1,9 @@
 local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
 local servicecode = require "enum.servicecode"
-local command = require 'command'
+local command = require "command"
+local CMD = require "cmd"
 local traceback = debug.traceback
-local CMD = command.cmd2()
 
 ------------------------------------------
 -- called by room
@@ -15,7 +15,7 @@ end
 function CMD:info()
 	-- body
 	assert(self)
-	return { name="xiaomiao"}
+	return {name = "xiaomiao"}
 end
 
 function CMD:alter_rcard(args)
@@ -41,7 +41,7 @@ end
 
 function CMD:room_leave()
 	-- body
-	log.info('room_leave')
+	log.info("room_leave")
 	return self.systems.room:leave()
 end
 
@@ -50,7 +50,7 @@ end
 
 ------------------------------------------
 -- 麻将协议代理,广播消息
-function CMD:join(args, ... )
+function CMD:join(args, ...)
 	-- body
 	self:send_request("join", args)
 	return servicecode.NORET
@@ -68,7 +68,7 @@ function CMD:offline(args)
 	return servicecode.NORET
 end
 
-function CMD:leave(args, ... )
+function CMD:leave(args, ...)
 	-- body
 	self:send_request("leave", args)
 	return servicecode.NORET
@@ -79,13 +79,13 @@ function CMD:take_ready(args)
 	return servicecode.NORET
 end
 
-function CMD:ready(args, ... )
+function CMD:ready(args, ...)
 	-- body
 	self:send_request("ready", args)
 	return servicecode.NORET
 end
 
-function CMD:deal(args, ... )
+function CMD:deal(args, ...)
 	-- body
 	self:send_request("deal", args)
 	return servicecode.NORET
@@ -409,6 +409,5 @@ end
 
 -- 德扑发送代理
 ------------------------------------------
-
 
 return CMD

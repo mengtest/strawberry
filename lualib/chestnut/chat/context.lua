@@ -9,9 +9,11 @@ local client = require "client"
 local CH = client.request()
 local _M = {}
 
-skynet.init(function ()
-	-- body
-end)
+skynet.init(
+	function()
+		-- body
+	end
+)
 
 function _M:on_data_init(dbData)
 	-- body
@@ -27,6 +29,9 @@ function _M:on_data_save(dbData)
 	assert(dbData ~= nil)
 
 	return true
+end
+
+function _M:on_enter()
 end
 
 return _M

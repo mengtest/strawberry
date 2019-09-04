@@ -15,26 +15,26 @@ local response_session = 0
 local response_session_name = {}
 local traceback = debug.traceback
 local version = 1
-local REQUEST = {}
-local RESPONSE = {}
-local login_type = 'so'
+local REQUEST = require "request"
+local RESPONSE = require "response"
+local login_type = "so"
 local gate
 local _middlewares = {}
 
 local function request(obj, name, args, response)
 	log.info("agent request [%s]", name)
-    local f = REQUEST[name]
-    if f then		
-	    local ok, result = xpcall(f, traceback, obj, args)
-	    if ok then
+	local f = REQUEST[name]
+	if f then
+		local ok, result = xpcall(f, traceback, obj, args)
+		if ok then
 			if result then
 				return response(result)
 			else
 				log.error("agent request [%s] result is nil", name)
 			end
-	    else
+		else
 			log.error("agent request [%s], error = [%s]", name, result)
-	    end
+		end
 	else
 		log.error("agent request [%s] is nil", name)
 	end
@@ -44,15 +44,15 @@ local function response(session, args)
 	-- body
 	local name = ctx:get_name_by_session(session)
 	-- log.info("agent response [%s]", name)
-    local f = RESPONSE[name]
-    if f then
+	local f = RESPONSE[name]
+	if f then
 		local ok, result = pcall(f, ctx, args)
-	    if not ok then
+		if not ok then
 			log.error(result)
-	    end
-    else
+		end
+	else
 		log.error("agent response [%s] is nil.", name)
-    end
+	end
 end
 
 local function send_package_id(id, pack)
@@ -71,20 +71,22 @@ local function get_name_by_session(session)
 	return response_session_name[session]
 end
 
-skynet.init(function ()
-end)
+skynet.init(
+	function()
+	end
+)
 
 skynet.register_protocol {
 	name = "client",
 	id = skynet.PTYPE_CLIENT,
-	unpack = function (msg, sz)
+	unpack = function(msg, sz)
 		if sz > 0 then
 			return host:dispatch(msg, sz)
 		else
 			assert(false)
 		end
 	end,
-	dispatch = function (fd, _, type, ...)
+	dispatch = function(fd, _, type, ...)
 		skynet.ignoreret()
 		if type == "REQUEST" then
 			-- local fd = session
@@ -92,21 +94,21 @@ skynet.register_protocol {
 			local obj = assert(objmgr.get(fd))
 			ctx.obj = obj
 			assert(obj.fd == fd)
-			for _,v in pairs(_middlewares) do
+			for _, v in pairs(_middlewares) do
 				v(ctx, ...)
 			end
 			local traceback = debug.traceback
 			local ok, result = xpcall(request, traceback, ctx, ...)
 			if ok then
 				if result then
-					if login_type == 'so' then
-						log.info('send response')
+					if login_type == "so" then
+						log.info("send response")
 						send_package_id(fd, result)
 					else
 						send_package_gate(fd, result)
 					end
 				else
-					log.error('result is nil')
+					log.error("result is nil")
 				end
 			else
 				log.error("agent dispatch error:")
@@ -161,16 +163,16 @@ function _M.push(obj, name, args)
 	assert(obj.authed)
 	assert(name)
 	local fd = assert(obj.fd)
-	
-	if login_type == 'so' then
+
+	if login_type == "so" then
 		local request = send_request(name, args, 0)
 		send_package_id(obj.fd, request)
 	end
 end
 
-function _M.push2objs(objs, name, args, ... )
+function _M.push2objs(objs, name, args, ...)
 	-- body
-	for k,v in pairs(objs) do
+	for k, v in pairs(objs) do
 		_M.push(v, name, args, ...)
 	end
 end

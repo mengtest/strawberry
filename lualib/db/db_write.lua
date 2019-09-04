@@ -133,7 +133,7 @@ function _M:write_user_funcopen(db_user_funcopens)
 		local res = self.db:query(sql)
 		if res.errno then
 			log.error('%s', self.dump(res))
-			return false
+			break
 		end
 	end
 end

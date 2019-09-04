@@ -22,6 +22,7 @@ local function init_user(mod)
 	mod.login_at = os.time()
 	mod.new_user = 1
 	mod.level = 1
+	mod.exp = 0
 end
 
 local _M = {}
@@ -45,6 +46,7 @@ function _M:on_data_init(db_data)
 		self.mod_user.login_at = os.time()
 		self.mod_user.new_user = data.new_user
 		self.mod_user.level = data.level
+		self.mod_user.exp = data.exp
 	end
 end
 
@@ -64,6 +66,7 @@ function _M:on_data_save(db_data)
 	db_data.db_user.login_at = self.mod_user.login_at
 	db_data.db_user.new_user = self.mod_user.new_user
 	db_data.db_user.level = self.mod_user.level
+	db_data.db_user.exp = self.mod_user.exp
 end
 
 function _M:on_enter()

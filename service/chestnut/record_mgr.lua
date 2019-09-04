@@ -13,7 +13,7 @@ local CMD = {}
 local SUB = {}
 
 local function save_data()
-	log.info('record_mgr save data.')
+	-- log.info('record_mgr save data.')
 end
 
 function SUB.save_data()
@@ -59,31 +59,31 @@ end
 
 function CMD.load()
 	-- body
-	local idx =  db:get(string.format("tb_count:%d:uid", const.RECORD_ID))
+	local idx = db:get(string.format("tb_count:%d:uid", const.RECORD_ID))
 	idx = math.tointeger(idx)
 	if idx > 1 then
-		local keys = db:zrange('tb_record', 0, -1)
-		for k,v in pairs(keys) do
+		local keys = db:zrange("tb_record", 0, -1)
+		for k, v in pairs(keys) do
 			zs:add(k, v)
 		end
 
-		for _,id in pairs(keys) do
-			local vals = db:hgetall(string.format('tb_record:%s', id))
+		for _, id in pairs(keys) do
+			local vals = db:hgetall(string.format("tb_record:%s", id))
 			local t = {}
-			for i=1,#vals,2 do
+			for i = 1, #vals, 2 do
 				local k = vals[i]
 				local v = vals[i + 1]
 				t[k] = v
 			end
-			sd.new(string.format('tb_record:%s', id), t)
+			sd.new(string.format("tb_record:%s", id), t)
 			-- t = sd.query(string.format('tg_sysmail:%s', id))
-		end	
+		end
 	end
 end
 
-function CMD.register(content, ... )
+function CMD.register(content, ...)
 	-- body
-	local id =  db:incr(string.format("tb_count:%d:uid", const.RECORD_ID))
+	local id = db:incr(string.format("tb_count:%d:uid", const.RECORD_ID))
 	dbmonitor.cache_update(string.format("tb_count:%d:uid", const.RECORD_ID))
 
 	-- sd.new
@@ -92,11 +92,11 @@ function CMD.register(content, ... )
 	r:insert_db()
 end
 
-function CMD.save_record(players, start_time, close_time, content, ... )
+function CMD.save_record(players, start_time, close_time, content, ...)
 	-- body
 end
 
 service.init {
-	name = '.RECORD_MGR',
+	name = ".RECORD_MGR",
 	command = CMD
 }

@@ -80,4 +80,6 @@ $(LUA_CLIB_PATH)/lfs.so : 3rd/luafilesystem/lfs.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) -I3rd/luafilesystem $^ -o $@
 
 clean :
-	rm -f $(LUA_CLIB_PATH)/*.so
+	rm -f strawberry $(LUA_CLIB_PATH)/*.so
+
+cleanall : clean

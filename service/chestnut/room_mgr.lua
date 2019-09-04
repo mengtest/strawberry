@@ -1,6 +1,6 @@
 local skynet = require "skynet"
 local mc = require "skynet.multicast"
-local ds = require "skynet.datasheet"
+local ds = require 'skynet.sharetable'
 local log = require "chestnut.skynet.log"
 local queue = require "chestnut.queue"
 local luaTableDump = require "luaTableDump"

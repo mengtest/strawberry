@@ -1,6 +1,7 @@
 local skynet = require "skynet"
 local lfs = require "lfs" 
 local builder = require "skynet.datasheet.builder"
+local sharetable = require 'skynet.sharetable'
 local log = require "xlog"
 
 function attrdir()
@@ -18,7 +19,7 @@ function attrdir()
                 if not M then
                     log.error(filename)
                 else
-                    builder.new(filename, M)
+                    sharetable.loadtable(filename, M)
                 end
             end
         end

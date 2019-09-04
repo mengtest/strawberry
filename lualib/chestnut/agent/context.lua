@@ -1,15 +1,15 @@
 local skynet = require "skynet"
 local mc = require "skynet.multicast"
 local log = require "chestnut.skynet.log"
-local AgentSystems = require "chestnut.agent.AgentSystems"
+local AgentSystems = require "chestnut.agent.systems"
 local servicecode = require "enum.servicecode"
 local CMD = require "chestnut.agent.cmd"
 local request = require "chestnut.agent.request"
 local logout = require "chestnut.agent.logout"
 local savedata = require "savedata"
 local objmgr = require "objmgr"
-local dbc = require 'db.db'
-local command = require 'command'
+local dbc = require "db.db"
+local command = require "command"
 local _M = command.cmd1()
 local SUB = {}
 local assert = assert
@@ -32,36 +32,42 @@ end
 
 local function save_data()
 	-- body
-	objmgr.foreach(function (obj, ... )
-		-- body
-		if obj.authed then
-			local data = {}
-			local ok, err = xpcall(AgentSystems.on_data_save, traceback, obj, data)
-			if ok then
-				if table.length(data) > 0 then
-					dbc.write_user(data)
+	objmgr.foreach(
+		function(obj, ...)
+			-- body
+			if obj.authed then
+				local data = {}
+				local ok, err = xpcall(AgentSystems.on_data_save, traceback, obj, data)
+				if ok then
+					if table.length(data) > 0 then
+						dbc.write_user(data)
+					end
+				else
+					log.error(err)
 				end
-			else
-				log.error(err)
 			end
 		end
-	end)
+	)
 end
 
-skynet.init(function ()
-	-- body
-end)
+skynet.init(
+	function()
+		-- body
+	end
+)
 
-function SUB.save_data( ... )
+function SUB.save_data(...)
 	-- body
 	save_data()
 end
 
 function _M.start()
 	-- body
-	savedata.init({
-		command=SUB
-	})
+	savedata.init(
+		{
+			command = SUB
+		}
+	)
 	return true
 end
 
@@ -86,6 +92,7 @@ function _M.kill()
 end
 
 function _M.login(gate, uid, subid, secret)
+	log.info("agent login")
 	local obj = objmgr.get(uid)
 	if obj then
 		obj.subid = subid
@@ -156,7 +163,9 @@ end
 
 function _M.afk(fd)
 	-- body
-	log.info('agent fd(%d) afk', fd)
+	log.info("agent fd(%d) afk", fd)
 	local obj = objmgr.get(fd)
 	return logout.logout(obj)
 end
+
+return _M

@@ -40,6 +40,9 @@ end
 
 local CMD = {}
 
+function CMD.register()
+end
+
 function CMD.uniq(name)
 	-- body
 	return launch_uniq(name)
@@ -47,10 +50,10 @@ end
 
 function CMD.kill()
 	-- body
-	for _,v in pairs(services) do
+	for _, v in pairs(services) do
 		skynet.call(v, "lua", "close")
 	end
-	log.info('kill services')
+	log.info("kill services")
 	-- skynet.exit()
 	-- skynet.abort()
 end

@@ -167,4 +167,18 @@ records 400 {
 
 ####################################### 
 # 成就模块 [450, 500)
-player_
+player_achievement 450 {
+    request {
+    }
+}
+
+####################################### 
+# 功能模块 [450, 500)
+player_funcs 500 {
+    request {
+        list 0 : *func
+    }
+    response {
+        errorcode 0 : integer
+    }
+}

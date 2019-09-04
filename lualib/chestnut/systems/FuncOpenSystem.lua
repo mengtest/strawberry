@@ -1,5 +1,5 @@
-local skynet = require 'skyenet'
-local ds = require "skynet.datasheet"
+local skynet = require 'skynet'
+local ds = require 'skynet.sharetable'
 local log = require "chestnut.skynet.log"
 local client = require "client"
 local table_dump = require "luaTableDump"
@@ -8,48 +8,63 @@ local _M = {}
 local funcopen_config
 
 skynet.init(function ()
-
+	funcopen_config = ds.query('funcopenConfig')
+	log.info(table_dump(funcopen_config))
 end)
 
 function _M:on_data_init(db_data)
 	-- body
-	log.info(luaTableDump(dbData))
 	self.mod_funcopen = {}
-	local funcs = {}
-	for _,db_item in pairs(dbData.db_user_funcopens) do
-		local item = {}
-		item.id = assert(db_item.id)
-		item.open = assert(db_item.open)
-		item.createAt = assert(db_item.create_at)
-		item.updateAt = assert(db_item.update_at)
-		funcs[tonumber(item.id)] = item
+	if #db_data.db_user_funcopens <= 0 then
+		local funcs = {}
+		for k,cfg in pairs(funcopen_config) do
+			local item = {}
+			item.id = tonumber(cfg.id)
+			item.open = 0
+			item.createAt = os.time()
+			item.updateAt = os.time()
+			funcs[tonumber(item.id)] = item
+		end
+		self.mod_funcopen.funcs = funcs	
+	else
+		local funcs = {}
+		for _,db_item in pairs(db_data.db_user_funcopens) do
+			local item = {}
+			item.id = assert(db_item.id)
+			item.open = assert(db_item.open)
+			item.createAt = assert(db_item.create_at)
+			item.updateAt = assert(db_item.update_at)
+			funcs[tonumber(item.id)] = item
+		end
+		self.mod_funcopen.funcs = funcs
 	end
-	self.dbFuncopen = funcs
 end
 
-function _M:on_data_save(dbData)
-	-- body
-	assert(dbData ~= nil)
-
-	-- save user
-	-- dbData.db_user_funcopens = {}
-	-- for _,item in pairs(self.dbFuncopen) do
-	-- 	-- print(k, item)
-	-- 	local db_item = {}
-	-- 	db_item.uid = assert(self.agentContext.uid)
-	-- 	db_item.id  = assert(item.id)
-	-- 	db_item.open = assert(item.open)
-	-- 	db_item.create_at = assert(item.createAt)
-	-- 	db_item.update_at = os.time()
-	-- 	table_insert(dbData.db_user_funcopens, db_item)
-	-- end
-	return true
+function _M:on_data_save(db_data)
+	db_data.db_user_funcopens = {}
+	for _,item in pairs(self.mod_funcopen.funcs) do
+		local db_item = {}
+		db_item.uid = assert(self.uid)
+		db_item.id  = assert(item.id)
+		db_item.open = assert(item.open)
+		db_item.create_at = assert(item.createAt)
+		db_item.update_at = os.time()
+		table_insert(db_data.db_user_funcopens, db_item)
+	end
 end
 
 function _M:on_enter()
 	-- body
-	-- local data = {}
-	-- client.push(self, 'nn', data)
+	local pack = {}
+	pack.list = {}
+	local data = self.mod_funcopen.funcs
+	for k,v in pairs(data) do
+		local item = {}
+		item.id = v.id
+		item.open = v.open
+		table.insert(pack.list, item)
+	end
+	client.push(self, 'player_funcs', pack)
 end
 
 function _M:on_exit()
@@ -58,7 +73,7 @@ end
 
 function _M:on_level_open()
 	-- body
-	local uid = self.agentContext.uid
+	local uid = self.uid
 	local userSystem = self.agentSystems.user
 	local funcopens = ds.query('funcopen')
 	for _,v in pairs(funcopens) do

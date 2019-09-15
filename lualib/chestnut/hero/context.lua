@@ -1,7 +1,11 @@
 local skynet = require "skynet"
-local list = require "common.list"
-local objmgr = require "objmgr"
 local ds = require "skynet.sharetable"
+local log = require "chestnut.skynet.log"
+local request = require "chestnut.hero.request"
+local response = require "chestnut.hero.response"
+local objmgr = require "objmgr"
+local client = require "client"
+local table_dump = require "luaTableDump"
 local assert = assert
 local _M = {}
 local hero_cfg
@@ -11,6 +15,9 @@ skynet.init(
 		hero_cfg = ds.query("heroConfig")
 	end
 )
+
+local function init_hero(obj)
+end
 
 function _M:init(id, ...)
 	-- body
@@ -45,9 +52,33 @@ function _M:init(id, ...)
 end
 
 function _M:on_data_init(db_data)
+	self.mod_hero = {}
+	self.mod_hero.heros = {}
+	for k, v in pairs(db_data.db_user_heros) do
+		local hero = {}
+		hero.hero_id = v.hero_id
+		hero.level = v.level
+		hero.create_at = v.create_at
+		hero.update_at = v.update_at
+		self.mod_hero.heros[hero.hero_id] = hero
+	end
 end
 
 function _M:on_data_save(db_data)
+	db_data.db_user_heros = {}
+	for _, v in pairs(self.mod_hero.heros) do
+		local hero = {}
+		hero.uid = self.uid
+		hero.hero_id = v.hero_id
+		hero.level = v.level
+		hero.create_at = v.create_at
+		hero.update_at = os.time()
+		table.insert(db_data.db_user_heros, hero)
+	end
+end
+
+function _M:on_enter()
+	client.push(self, "player_heros", {list = {{id = 111, level = 1}}})
 end
 
 ------------------------------------------

@@ -1,5 +1,5 @@
 local skynet = require "skynet"
-local ds = require "skynet.datasheet"
+local sd = require "skynet.sharetable"
 local log = require "chestnut.skynet.log"
 local client = require "client"
 
@@ -62,14 +62,13 @@ function _M:on_enter()
 		end
 	end
 
-	local res = {}
-	res.errorcode = 0
-	res.isCreated = D.isCreated
-	res.joined = D.joined
-	res.roomid = D.id
-	res.type = D.type
-	res.mode = D.mode
-	client.push(self, "room_info", res)
+	local req = {}
+	req.isCreated = false
+	req.joined = false
+	req.roomid = D.id
+	req.type = D.type
+	req.mode = D.mode
+	client.push(self, "room_info", req)
 end
 
 function _M:on_exit(...)

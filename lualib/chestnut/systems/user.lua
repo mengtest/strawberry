@@ -1,14 +1,15 @@
-local skynet = require 'skynet'
+local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
-local client = require 'client'
+local client = require "client"
+local table_dump = require "luaTableDump"
 
 local function init_user(mod)
-	local sex      = 1
+	local sex = 1
 	local nickname = "hell"
-	local province = 'Beijing'
-	local city     = "Beijing"
-	local country  = "CN"
-	local headimg  = "xx"
+	local province = "Beijing"
+	local city = "Beijing"
+	local country = "CN"
+	local headimg = "xx"
 	mod.sex = sex
 	mod.nickname = nickname
 	mod.province = province
@@ -28,6 +29,7 @@ end
 local _M = {}
 
 function _M:on_data_init(db_data)
+	log.info(table_dump(db_data))
 	local data = db_data.db_users[1]
 	self.mod_user = {}
 	if data == nil then
@@ -47,10 +49,15 @@ function _M:on_data_init(db_data)
 		self.mod_user.new_user = data.new_user
 		self.mod_user.level = data.level
 		self.mod_user.exp = data.exp
+
+		if self.mod_user.exp == nil then
+			self.mod_user.exp = 1
+		end
 	end
 end
 
 function _M:on_data_save(db_data)
+	log.info("user on_data_save")
 	db_data.db_user = {}
 	db_data.db_user.uid = self.uid
 	db_data.db_user.sex = self.mod_user.sex
@@ -72,12 +79,12 @@ end
 function _M:on_enter()
 	-- body
 	local pack = {
-		num      = 0,
-        nickname = self.mod_user.nickname,
-		nameid   = self.mod_user.nameid,
-        rcard    = 0
+		num = 0,
+		nickname = self.mod_user.nickname,
+		nameid = self.mod_user.nameid,
+		rcard = 0
 	}
-	client.push(self, 'base_info', pack)
+	client.push(self, "base_info", pack)
 end
 
 function _M:on_exit()

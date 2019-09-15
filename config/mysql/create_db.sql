@@ -539,7 +539,6 @@ DROP PROCEDURE IF EXISTS `sp_user_insert_or_update`;
 DELIMITER ;;
 CREATE PROCEDURE `sp_user_insert_or_update`(IN `in_uid` bigint,IN `in_sex` int,IN `in_nickname` varchar(255),IN `in_province` varchar(255),IN `in_city` varchar(255),IN `in_country` varchar(255),IN `in_headimg` varchar(255),IN `in_openid` varchar(255),IN `in_nameid` varchar(255),IN `in_create_at` int,IN `in_update_at` int,IN `in_login_at` int,IN `in_new_user` int,IN `in_level` int)
 BEGIN
-	#Routine body goes here...
 	INSERT INTO tb_user(uid, sex, nickname, province, city, country, headimg, openid, nameid, create_at, update_at, login_at, new_user, `level`)
 	VALUES (in_uid, in_sex, in_nickname, in_province, in_city, in_country, in_headimg, in_openid, in_nameid, in_create_at, in_update_at, in_login_at, in_new_user, in_level)
 	ON DUPLICATE KEY UPDATE uid=in_uid, sex=in_sex,

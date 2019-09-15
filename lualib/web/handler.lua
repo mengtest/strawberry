@@ -1,7 +1,7 @@
 local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
-local mime = require "gm.web.mime"
-local urls = require "gm.web.urls"
+local mime = require "web.mime"
+local urls = require "web.urls"
 local static_cache = {}
 local cache = true
 local root = skynet.getenv "http_root"
@@ -12,7 +12,7 @@ local function unpack_seg(text, s)
 	assert(text and s)
 	local from = text:find(s, 1, true)
 	if from then
-		return text:sub(1, from-1), text:sub(from+1)
+		return text:sub(1, from - 1), text:sub(from + 1)
 	else
 		return text
 	end
@@ -21,43 +21,43 @@ end
 local function unpack_line(text)
 	local from = text:find("\n", 1, true)
 	if from then
-		return text:sub(1, from-1), text:sub(from+1)
+		return text:sub(1, from - 1), text:sub(from + 1)
 	end
 	return nil, text
 end
 
-local function split_file_name(path, ... )
+local function split_file_name(path, ...)
 	-- body
 	assert(type(path) == "string")
 	return ""
 end
 
-local function split_file_suffix(path, ... )
+local function split_file_suffix(path, ...)
 	-- body
 	return ""
 end
 
-local function parse( ... )
+local function parse(...)
 	-- body
-	local str = tostring( ... )
+	local str = tostring(...)
 	if str and #str > 0 then
-		local r = {}	
-		local function split( str )
+		local r = {}
+		local function split(str)
 			-- body
 			local p = string.find(str, "=")
 			local key = string.sub(str, 1, p - 1)
 			local value = string.sub(str, p + 1)
 			r[key] = value
-	 	end
+		end
 		local s = 1
 		repeat
 			local p = string.find(str, "&", s)
-			if p ~= nil then 
-				local frg =	string.sub(str, s, p - 1)
+			if p ~= nil then
+				local frg = string.sub(str, s, p - 1)
 				s = p + 1
 				split(frg)
 			else
-				local frg =	string.sub(str, s)
+				local frg = string.sub(str, s)
 				split(frg)
 				break
 			end
@@ -68,7 +68,7 @@ local function parse( ... )
 	end
 end
 
-local function parse_file( header, boundary, body )
+local function parse_file(header, boundary, body)
 	-- body
 	local line = ""
 	local file = ""
@@ -84,7 +84,7 @@ local function parse_file( header, boundary, body )
 		if string.match(line, string.format("^-*(%s)-*", mark)) then
 			break
 		else
-			file = file .. line .. "\n" 
+			file = file .. line .. "\n"
 			line, last = unpack_line(last)
 		end
 	end
@@ -92,7 +92,7 @@ local function parse_file( header, boundary, body )
 	return file, header
 end
 
-local function parse_content_type(content_type, ... )
+local function parse_content_type(content_type, ...)
 	-- body
 	assert(content_type)
 	local res = {}
@@ -101,7 +101,7 @@ local function parse_content_type(content_type, ... )
 		res.type = t
 		if t == "multipart/form-data" then
 			local idx = string.find(c, "=")
-			local boundary = string.sub(c, idx+1)
+			local boundary = string.sub(c, idx + 1)
 			res.boundary = boundary
 			return res
 		else
@@ -124,9 +124,9 @@ local function parse_content_type(content_type, ... )
 	end
 end
 
-local function post_handler(path, method, query, ... )
+local function post_handler(path, method, query, ...)
 	-- body
-	for k,v in pairs(urls) do
+	for k, v in pairs(urls) do
 		if string.match(path, k) then
 			local args = {}
 			args.method = "post"
@@ -143,8 +143,8 @@ local function post_handler(path, method, query, ... )
 	return false
 end
 
-function _M.handle_file(code, path, header, body,  ... )
-	-- body
+function _M.handle_post(ctx)
+	local header = ctx.header
 	local mime_version = header["mime-version"]
 	local content_type = header["content-type"]
 	local content_transfer_encoding = header["content-transfer-encoding"]
@@ -159,18 +159,13 @@ function _M.handle_file(code, path, header, body,  ... )
 	elseif t == "multipart/form-data" then
 		local boundary = res.boundary
 		local res = parse_file(header, boundary, body)
-		return post_handler(path, "file", res)
+		post_handler(path, "file", res)
 	else
 		return false
 	end
 end
 
-function _M.handle_post(path, header, body, post_handler, ... )
-	-- body
-	return post_handler(path, "post", body)
-end
-
-local function fetch_static(path, ... )
+local function fetch_static(path, ...)
 	-- body
 	if cache then
 		if static_cache[path] then
@@ -186,7 +181,7 @@ local function fetch_static(path, ... )
 				fd:close()
 				static_cache[path] = r
 				return true, r
-			end	
+			end
 		end
 	else
 		local fpath = root .. path
@@ -199,11 +194,11 @@ local function fetch_static(path, ... )
 			fd:close()
 			static_cache[path] = r
 			return true, r
-		end	
+		end
 	end
 end
 
-function _M.handle_static(code, path, header, body, handle_static, ... )
+function _M.handle_static(code, path, header, body, handle_static, ...)
 	-- body
 	if string.match(path, "^/[%w%./-]+%.%w+") then
 		local ok, res = fetch_static(path)
@@ -215,7 +210,7 @@ function _M.handle_static(code, path, header, body, handle_static, ... )
 		local content_disposition = header["content-disposition"]
 		local content_length = header["content-length"]
 		local name = split_file_name(path)
-		for _,v in pairs(mime) do
+		for _, v in pairs(mime) do
 			local fpath = path .. "." .. v[1]
 			local ok, res = fetch_static(fpath)
 			if ok then
@@ -227,9 +222,14 @@ function _M.handle_static(code, path, header, body, handle_static, ... )
 	end
 end
 
-function _M.handle_get(code, path, query, header, body, ... )
-	-- body
-	return post_handler(path, "get", query)
+function _M.handle_get(ctx)
+	local path = ctx.path
+	local v = urls.get[path]
+	local ok, err = pcall(v, ctx)
+	if not ok then
+		ctx.status = 500
+		ctx.body = "internal error."
+	end
 end
 
 return _M

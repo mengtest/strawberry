@@ -1,7 +1,5 @@
 local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
-local time_utils = require "common.utils"
-local logout = require "chestnut.agent.logout"
 local servicecode = require "enum.servicecode"
 local client = require "client"
 local objmgr = require "objmgr"

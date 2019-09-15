@@ -9,16 +9,16 @@ local client = require "client"
 local CH = client.request()
 local _M = {}
 
-local function send_inbox_list(obj, ... )
+local function send_inbox_list(obj, ...)
 	-- body
 	local l = {}
-	for _,v in pairs(self._mk) do
+	for _, v in pairs(self._mk) do
 		if v.viewed.value == 0 then
 			local mail = {}
-			mail.id       = v.mailid
-			mail.viewed   = v.viewed
-			mail.title    = t.title
-			mail.content  = t.content
+			mail.id = v.mailid
+			mail.viewed = v.viewed
+			mail.title = t.title
+			mail.content = t.content
 			mail.datetime = t.datetime
 			table.insert(l, mail)
 		end
@@ -29,9 +29,11 @@ local function send_inbox_list(obj, ... )
 	client.push(obj, "inbox", args)
 end
 
-skynet.init(function ()
-	-- body
-end)
+skynet.init(
+	function()
+		-- body
+	end
+)
 
 function _M:on_data_init(dbData)
 end
@@ -40,16 +42,16 @@ function _M:on_data_save(dbData)
 	-- body
 end
 
-function _M:on_enter( ... )
+function _M:on_enter(...)
 	-- body
 	send_inbox_list(self)
 end
 
-function _M:on_exit( ... )
+function _M:on_exit(...)
 	-- body
 end
 
-function _M:add(mail, ... )
+function _M:add(mail, ...)
 	-- body
 	table.insert(self._data, mail)
 	self._count = self._count + 1
@@ -57,41 +59,40 @@ function _M:add(mail, ... )
 	self._mkzs:add(1, string.format("%d", mail.id.value))
 end
 
-function _M:poll( ... )
+function _M:poll(...)
 	-- body
-	skynet.fork(function ( ... )
-		-- body
-		-- local res
-		-- if self._count > 0 then
-		-- 	res = sysmaild.poll(self._mkzs:range(self._mkzs:count() - 1, self._mkzs:count())[1])	
-		-- else
-		-- 	res = sysmaild.poll(0)
-		-- end
-
-		-- log.info("sysinbox poll %d", #res)
-		-- for _,mailid in pairs(res) do
-		-- 	local i = sysmail.new(self._env, self._dbctx, self)
-
-		-- 	i.id.value = snowflake.next_id()
-		-- 	i.uid.value = self._env._suid
-		-- 	i.mailid.value = math.tointeger(mailid)
-		-- 	i.viewed.value = 0
-		-- 	i:insert_cache()
-
-		-- 	self:add(i)
-		-- end
-	end)
+	skynet.fork(
+		function(...)
+			-- body
+			-- local res
+			-- if self._count > 0 then
+			-- 	res = sysmaild.poll(self._mkzs:range(self._mkzs:count() - 1, self._mkzs:count())[1])
+			-- else
+			-- 	res = sysmaild.poll(0)
+			-- end
+			-- log.info("sysinbox poll %d", #res)
+			-- for _,mailid in pairs(res) do
+			-- 	local i = sysmail.new(self._env, self._dbctx, self)
+			-- 	i.id.value = snowflake.next_id()
+			-- 	i.uid.value = self._env._suid
+			-- 	i.mailid.value = math.tointeger(mailid)
+			-- 	i.viewed.value = 0
+			-- 	i:insert_cache()
+			-- 	self:add(i)
+			-- end
+		end
+	)
 end
 
-function _M:send_inbox(id, ... )
+function _M:send_inbox(id, ...)
 	-- body
 	local v = assert(self._mk[id])
 	local l = {}
 	local mail = {}
-	mail.id       = v.mailid
-	mail.viewed   = v.viewed
-	mail.title    = t.title
-	mail.content  = t.content
+	mail.id = v.mailid
+	mail.viewed = v.viewed
+	mail.title = t.title
+	mail.content = t.content
 	mail.datetime = t.datetime
 	table.insert(l, mail)
 	local args = {}
@@ -99,20 +100,20 @@ function _M:send_inbox(id, ... )
 	self.context:send_request("inbox", args)
 end
 
-function CH:fetch(args, ... )
+function CH:fetch(args)
 	-- body
 	log.info("sysinbox fetch")
 	local res = {}
 	res.errorcode = errorcode.SUCCESS
 	res.inbox = {}
-	for k,v in pairs(self._mk) do
+	for k, v in pairs(self._mk) do
 		if v.viewed.value == 0 then
 			local mail = {}
 			mail.id = v.mailid.value
 			mail.viewed = v.viewed.value
 			local t = sd.query(string.format("%s:%d", self._tname, v.mailid))
-			mail.title    = t.title
-			mail.content  = t.content
+			mail.title = t.title
+			mail.content = t.content
 			mail.datetime = t.datetime
 			table.insert(res.inbox, mail)
 		end
@@ -120,20 +121,20 @@ function CH:fetch(args, ... )
 	return res
 end
 
-function CH:sync(args, ... )
+function CH:sync(args)
 	-- body
 	log.info("sysinbox sync")
 	local res = {}
 	res.errorcode = errorcode.SUCCESS
 	res.inbox = {}
-	for k,v in pairs(self._data) do
+	for k, v in pairs(self._data) do
 		if v.viewed.value == 0 then
 			local mail = {}
 			mail.id = v.mailid.value
 			mail.datetime = v.datetime.value
 			mail.viewed = v.viewed.value
 			local t = sd.query(string.format("tg_sysmail:%d", v.mailid.value))
-			mail.title   = t.title
+			mail.title = t.title
 			mail.content = t.content
 			table.insert(res.inbox, mail)
 		end
@@ -141,7 +142,7 @@ function CH:sync(args, ... )
 	return res
 end
 
-function CH:viewed(args, ... )
+function CH:viewed(args)
 	-- body
 	local mail = self._mk[args.mailid]
 	mail:set_viewed(1)

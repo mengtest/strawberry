@@ -2,52 +2,58 @@ local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
 local service = require "service"
 local zset = require "zset"
+local db = require "db.db"
+local savedata = require "savedata"
+local table_dump = require "luaTableDump"
 local assert = assert
-
-local users = {}
 local ldname
+local set
+local users = {}
 local CMD = {}
 local SUB = {}
 
 local function save_data()
 end
 
-function SUB.save_data( ... )
-	-- body
+function SUB.save_data()
+	save_data()
 end
-
-
-
 
 function CMD.start(name)
 	-- body
 	ldname = name
+	savedata.init {
+		command = SUB
+	}
+	savedata.subscribe()
 	return true
 end
 
 function CMD.init_data()
-	-- body
+	set = zset.new()
+	local res = db.read_zset(ldname)
+	-- skynet.error(table_dump(res))
+	for _, r in pairs(res.db_zset) do
+		set:add(r.power, {uid = r.uid})
+	end
 	return true
 end
 
 function CMD.sayhi()
-	-- body
 	return true
 end
 
 function CMD.close()
-	-- body
 	save_data()
 	return true
 end
 
 function CMD.kill()
-	-- body
 	skynet.exit()
 end
 
 -- 访问数据
-function CMD.login(uid, agent, key, ... )
+function CMD.login(uid, agent, key, ...)
 	-- body
 	local u = users[uid]
 	if u then
@@ -76,7 +82,7 @@ function CMD.push(uid, key)
 	return ld:bsearch(u)
 end
 
-function CMD.bsearch(uid, ... )
+function CMD.bsearch(uid, ...)
 	-- body
 	local u = users[uid]
 	return ld:bsearch(u)
@@ -93,6 +99,6 @@ function CMD.nearby(rank)
 end
 
 service.init {
-	name = '.ZSETD',
+	name = ".ZSETD",
 	command = CMD
 }

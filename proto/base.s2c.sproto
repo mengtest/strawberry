@@ -43,6 +43,7 @@ base_info 101 {
         nickname 1 : string
         nameid 2 : string
         rcard 3 : integer
+        level 4 : integer
     }
     response {
         errorcode 0 : integer
@@ -62,6 +63,9 @@ radio 102 {
 new_name 103 {
     request {
         nickname  0 : string
+    }
+    response {
+        errorcode 0 : integer
     }
 }
 
@@ -173,7 +177,7 @@ player_achievement 450 {
 }
 
 ####################################### 
-# 功能模块 [450, 500)
+# 功能模块 [500, 550)
 player_funcs 500 {
     request {
         list 0 : *func
@@ -182,3 +186,15 @@ player_funcs 500 {
         errorcode 0 : integer
     }
 }
+
+####################################### 
+# 英雄模块 [550, 600)
+player_heros 550 {
+    request {
+        list 0 : *hero
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+

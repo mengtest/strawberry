@@ -1,10 +1,11 @@
 local log = require "chestnut.skynet.log"
-local ahievement = require "chestnut.achievement.achievement"
-local FuncOpenSystem = require "chestnut.systems.FuncOpenSystem"
-local PackageSystem = require "chestnut.systems.PackageSystem"
-local RoomSystem = require "chestnut.systems.RoomSystem"
+local ahievement = require "chestnut.achievement.context"
+local PackageSystem = require "chestnut.bag.context"
+local RoomSystem = require "chestnut.room.context"
+local hero = require "chestnut.hero.context"
+local FuncOpenSystem = require "chestnut.systems.funcopen"
 local user = require "chestnut.systems.user"
-local log = require "chestnut.skynet.log"
+
 local traceback = debug.traceback
 local table_insert = table.insert
 
@@ -17,6 +18,7 @@ function Processors:on_data_init(dbData)
     FuncOpenSystem.on_data_init(self, dbData)
     PackageSystem.on_data_init(self, dbData)
     RoomSystem.on_data_init(self, dbData)
+    hero.on_data_init(self, dbData)
 end
 
 function Processors:on_data_save(dbData)
@@ -26,12 +28,14 @@ function Processors:on_data_save(dbData)
     PackageSystem.on_data_save(self, dbData)
     RoomSystem.on_data_save(self, dbData)
     user.on_data_save(self, dbData)
+    hero.on_data_save(self, dbData)
 end
 
 function Processors:on_enter()
     user.on_enter(self)
     FuncOpenSystem.on_enter(self)
     RoomSystem.on_enter(self)
+    hero.on_enter(self)
 end
 
 function Processors:on_exit()

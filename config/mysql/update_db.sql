@@ -77,7 +77,7 @@ IF lastVersion < 7 THEN
 		`level` int(11) NOT NULL,
 		`create_at` int(11) NOT NULL,
 		`update_at` int(11) NOT NULL,
-		PRIMARY KEY (`id`, `hero_id`)
+		PRIMARY KEY (`uid`, `hero_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='英雄角色';
 
 	SET lastVersion = 7;
@@ -188,20 +188,7 @@ BEGIN
 		in_new_user, 
 		in_level,
 		in_exp)
-	ON DUPLICATE KEY UPDATE uid=in_uid, sex=in_sex,
-		nickname=in_nickname, 
-		province=in_province, 
-		city=in_city, 
-		country=in_country, 
-		headimg=in_headimg,
-		openid=in_openid, 
-		nameid=in_nameid, 
-		create_at=in_create_at, 
-		update_at=in_update_at, 
-		login_at=in_login_at, 
-		new_user=in_new_user,
-		`level`=in_level,
-		exp=in_exp;
+	ON DUPLICATE KEY UPDATE uid=in_uid;
 END
 ;;
 
@@ -214,11 +201,9 @@ DROP PROCEDURE IF EXISTS `sp_user_heros_select`;
 DELIMITER ;;
 CREATE PROCEDURE `sp_user_heros_select`(IN `in_uid` bigint)
 BEGIN
-	-- Routine body goes here...
 	SELECT * FROM tb_user_heros WHERE uid=in_uid;
 END
 ;;
-DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for sp_user_heros_insert_or_update
@@ -235,6 +220,35 @@ BEGIN
 	INSERT INTO tb_user_heros(uid, hero_id, level, create_at, update_at)
 	VALUES (in_uid, in_hero_id, in_level, in_create_at, in_update_at)
 	ON DUPLICATE KEY UPDATE uid=in_uid, id=in_hero_id;
+END;;
+
+-- ----------------------------
+-- Procedure structure for sp_zset_power_select
+-- ----------------------------
+DELIMITER ;
+DROP PROCEDURE IF EXISTS `sp_zset_power_select`;
+DELIMITER ;;
+CREATE PROCEDURE `sp_zset_power_select`()
+BEGIN
+	SELECT * FROM tb_zset_power;
+END
+;;
+
+-- ----------------------------
+-- Procedure structure for sp_zset_power_insert_or_update
+-- ----------------------------
+DELIMITER ;
+DROP PROCEDURE IF EXISTS `sp_zset_power_insert_or_update`;
+DELIMITER ;;
+CREATE PROCEDURE `sp_zset_power_insert_or_update`(IN `in_id` int,
+	IN `in_uid` bigint,
+	IN `in_power` int,
+	IN `in_create_at` int,
+	IN `in_update_at` int)
+BEGIN
+	INSERT INTO tb_zset_power(id, uid, power, create_at, update_at)
+	VALUES (in_id, in_uid, in_power, in_create_at, in_update_at)
+	ON DUPLICATE KEY UPDATE uid=in_id;
 END;;
 
 # 过程修改结束

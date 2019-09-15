@@ -1,19 +1,20 @@
 local skynet = require "skynet"
-local mc = require "skynet.multicast"
 local log = require "chestnut.skynet.log"
 local AgentSystems = require "chestnut.agent.systems"
 local servicecode = require "enum.servicecode"
 local CMD = require "chestnut.agent.cmd"
 local request = require "chestnut.agent.request"
+local response = require "chestnut.agent.response"
 local logout = require "chestnut.agent.logout"
 local savedata = require "savedata"
 local objmgr = require "objmgr"
 local dbc = require "db.db"
 local command = require "command"
+local stp = require "StackTracePlus"
+local traceback = stp.stacktrace
 local _M = command.cmd1()
 local SUB = {}
 local assert = assert
-local traceback = debug.traceback
 local _reload = false
 
 local function init_data(obj)
@@ -31,16 +32,16 @@ local function init_data(obj)
 end
 
 local function save_data()
-	-- body
 	objmgr.foreach(
-		function(obj, ...)
-			-- body
+		function(obj)
 			if obj.authed then
 				local data = {}
 				local ok, err = xpcall(AgentSystems.on_data_save, traceback, obj, data)
 				if ok then
 					if table.length(data) > 0 then
 						dbc.write_user(data)
+					else
+						log.error("uid(%d) not data", obj.uid)
 					end
 				else
 					log.error(err)
@@ -52,12 +53,10 @@ end
 
 skynet.init(
 	function()
-		-- body
 	end
 )
 
 function SUB.save_data(...)
-	-- body
 	save_data()
 end
 
@@ -72,7 +71,6 @@ function _M.start()
 end
 
 function _M.init_data()
-	-- body
 	return true
 end
 
@@ -83,12 +81,10 @@ function _M.sayhi(reload)
 end
 
 function _M.close()
-	-- body
 	return true
 end
 
 function _M.kill()
-	-- body
 end
 
 function _M.login(gate, uid, subid, secret)
@@ -120,7 +116,6 @@ end
 
 -- call by gated
 function _M.logout(uid)
-	-- body
 	local obj = objmgr.get(uid)
 	assert(obj.logined)
 	assert(obj.authed)
@@ -144,7 +139,6 @@ end
 
 -- call by agent mgr
 function _M.kill_cache(uid)
-	-- body
 	local obj = objmgr.get(uid)
 	assert(obj)
 	objmgr.del(obj)
@@ -157,14 +151,13 @@ function _M.auth(args)
 	obj.fd = args.client
 	obj.authed = true
 	objmgr.addfd(obj)
-	assert(obj == objmgr.get(args.client))
+	assert(obj == objmgr.get_by_fd(args.client))
 	return true
 end
 
 function _M.afk(fd)
-	-- body
 	log.info("agent fd(%d) afk", fd)
-	local obj = objmgr.get(fd)
+	local obj = objmgr.get_by_fd(fd)
 	return logout.logout(obj)
 end
 

@@ -22,7 +22,7 @@ local gate
 local _middlewares = {}
 
 local function request(obj, name, args, response)
-	log.info("agent request [%s]", name)
+	-- log.info("agent request [%s]", name)
 	local f = REQUEST[name]
 	if f then
 		local ok, result = xpcall(f, traceback, obj, args)
@@ -91,7 +91,7 @@ skynet.register_protocol {
 		if type == "REQUEST" then
 			-- local fd = session
 			local ctx = {}
-			local obj = assert(objmgr.get(fd))
+			local obj = assert(objmgr.get_by_fd(fd))
 			ctx.obj = obj
 			assert(obj.fd == fd)
 			for _, v in pairs(_middlewares) do
@@ -102,7 +102,7 @@ skynet.register_protocol {
 			if ok then
 				if result then
 					if login_type == "so" then
-						log.info("send response")
+						-- log.info("send response")
 						send_package_id(fd, result)
 					else
 						send_package_gate(fd, result)

@@ -45,3 +45,9 @@
     id   0 : integer
     open 1 : integer
 }
+
+.hero {
+    id 0 : integer
+    level 1 : integer
+}
+

@@ -9,18 +9,16 @@ local REQUEST = client.request()
 local traceback = debug.traceback
 
 function REQUEST:fetchinbox(args)
-	-- body
-	local M = self.modules.inbox
-	return M:fetch(args)
+	local obj = self.obj
+	context.package_info(obj, args)
 end
 
 function REQUEST:syncsysmail(args)
-	-- body
-	return self._sysinbox:sync(args)
+	local obj = self.obj
+	return context.sync(obj, args)
 end
 
-function REQUEST:viewedsysmail(args, ...)
-	-- body
+function REQUEST:viewedsysmail(args)
 	local entity = self:get_entity()
 	local sysinbox = entity:get_component("sysinbox")
 	return sysinbox:viewed(args)

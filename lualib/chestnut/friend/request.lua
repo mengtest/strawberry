@@ -10,16 +10,30 @@ local assert = assert
 local REQUEST = client.request()
 local traceback = debug.traceback
 
-function REQUEST:fetchinbox(args)
+function REQUEST:fetch_friends(args)
+	local obj = self.obj
 	return context.fetch(self, args)
 end
 
-function REQUEST:syncsysmail(args)
+function REQUEST:rm_friend(args)
+	local obj = self.obj
 	return context.sync(self, args)
 end
 
-function REQUEST:viewedsysmail(args)
-	return context.viewed(self, args)
+function REQUEST:fetch_friend_reqs(args)
+	local obj = self.obj
+end
+
+function REQUEST:acc_friend_req(args)
+end
+
+function REQUEST:rej_friend_req(args)
+end
+
+function REQUEST:acc_friend_req_all(args)
+end
+
+function REQUEST:rej_friend_req_all(args)
 end
 
 return REQUEST

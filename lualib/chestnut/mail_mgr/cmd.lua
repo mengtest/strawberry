@@ -44,7 +44,7 @@ function subscribe.save_data()
     -- save_data()
 end
 
-function CMD.start()
+function CMD:start()
     savedata.init {
         command = subscribe
     }
@@ -52,7 +52,7 @@ function CMD.start()
     return true
 end
 
-function CMD.init_data()
+function CMD:init_data()
     -- body
     -- local pack = redis:get("tb_sysmail")
     -- if pack then
@@ -73,31 +73,29 @@ function CMD.init_data()
     return true
 end
 
-function CMD.sayhi()
-    -- body
+function CMD:sayhi()
     -- 初始化各种全服信息
     return true
 end
 
-function CMD.close(...)
-    -- body
+function CMD:close(...)
     save_data()
     return true
 end
 
-function CMD.kill(...)
+function CMD:kill(...)
     -- body
     skynet.exit()
 end
 
 -- 各种全服服务初始
-function CMD.init_rooms(rooms, ...)
+function CMD:init_rooms(rooms, ...)
     -- body
     rooms = rooms
 end
 
 -- 用户初始
-function CMD.poll(uid, agent, max_id, ...)
+function CMD:poll(uid, agent, max_id, ...)
     -- body
     assert(users[uid] == nil)
     local u = {uid = uid, agent = agent}
@@ -118,13 +116,12 @@ function CMD.poll(uid, agent, max_id, ...)
     end
 end
 
-function CMD.afk(uid, ...)
-    -- body
+function CMD:afk(uid, ...)
     assert(users[uid])
     users[uid] = nil
 end
 
-function CMD.new_mail(title, content, appendix, to, ...)
+function CMD:new_mail(title, content, appendix, to, ...)
     -- body
     local now = skynet.time()
     local mail = {}

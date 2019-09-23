@@ -98,8 +98,9 @@ end
 ------------------------------------------
 -- about user
 function _M:read_users_by_uid(uid)
-	-- body
-	local res = self.db:query(string_format("CALL sp_user_select(%d);", uid))
+	local sql = string_format("CALL sp_user_select(%d);", uid)
+	log.info(sql)
+	local res = self.db:query(sql)
 	if res.errno then
 		log.error("%s", self.dump(res))
 		return {}
@@ -111,7 +112,6 @@ function _M:read_users_by_uid(uid)
 end
 
 function _M:read_user_rooms(uid)
-	-- body
 	local res = self.db:query(string_format("CALL sp_user_room_select(%d);", uid))
 	if res.errno then
 		log.error("%s", self.dump(res))
@@ -150,6 +150,42 @@ end
 
 function _M:read_user_heros(uid)
 	local res = self.db:query(string_format("CALL sp_user_heros_select(%d);", uid))
+	if res.errno then
+		log.error("%s", self.dump(res))
+		return {}
+	end
+	if res.multiresultset then
+		return res[1]
+	end
+	return res
+end
+
+function _M:read_user_friends(uid)
+	local res = self.db:query(string_format("CALL sp_user_friends_select(%d);", uid))
+	if res.errno then
+		log.error("%s", self.dump(res))
+		return {}
+	end
+	if res.multiresultset then
+		return res[1]
+	end
+	return res
+end
+
+function _M:read_user_friends(uid)
+	local res = self.db:query(string_format("CALL sp_user_friends_select(%d);", uid))
+	if res.errno then
+		log.error("%s", self.dump(res))
+		return {}
+	end
+	if res.multiresultset then
+		return res[1]
+	end
+	return res
+end
+
+function _M:read_user_friend_reqs(uid)
+	local res = self.db:query(string_format("CALL sp_user_friend_reqs_select(%d);", uid))
 	if res.errno then
 		log.error("%s", self.dump(res))
 		return {}

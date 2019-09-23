@@ -101,5 +101,60 @@ active_achievement 450 {
     }
 }
 
+#######################################
+# 功能模块 [500, 550)
+
 ####################################### 
-# 记录模块 [450, 500)
+# 好友模块 [600, 650)
+friend_fetch 600 {
+    request {
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+friend_rm 601 {
+    request {}
+    response {
+        errorcode 0 : integer
+    }
+}
+
+friend_add_req 602 {
+    request {
+        who 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+friend_add 603 {
+    request {
+        who 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+####################################### 
+# 排行榜模块 [650, 700)
+rank_power 650 {
+    request {
+    }
+    response {
+        errorcode 0 : integer
+        list 1 : *rank_power_item
+    }
+}
+
+####################################### 
+# 每日任务模块 [700, 750)
+taskdaily_fetch 700 {
+    response {
+        errorcode 0 : integer
+        tasks 1 : *taskdaily
+    }
+}

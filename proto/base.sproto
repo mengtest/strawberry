@@ -51,3 +51,13 @@
     level 1 : integer
 }
 
+.rank_power_item {
+    id 0 : integer
+    uid 1 : integer
+    power 2 : integer
+}
+
+.taskdaily {
+    id 0 : integer
+    finished 1 : integer
+}

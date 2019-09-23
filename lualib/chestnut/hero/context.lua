@@ -19,7 +19,7 @@ skynet.init(
 local function init_hero(obj)
 end
 
-function _M:init(id, ...)
+function _M.init(id, ...)
 	-- body
 	-- self.ball = ball()
 	-- self.pool = Chestnut.EntitasPP.Pool.Create()
@@ -51,7 +51,7 @@ function _M:init(id, ...)
 	return self
 end
 
-function _M:on_data_init(db_data)
+function _M.on_data_init(self, db_data)
 	self.mod_hero = {}
 	self.mod_hero.heros = {}
 	for k, v in pairs(db_data.db_user_heros) do
@@ -64,7 +64,7 @@ function _M:on_data_init(db_data)
 	end
 end
 
-function _M:on_data_save(db_data)
+function _M.on_data_save(self, db_data)
 	db_data.db_user_heros = {}
 	for _, v in pairs(self.mod_hero.heros) do
 		local hero = {}
@@ -77,13 +77,13 @@ function _M:on_data_save(db_data)
 	end
 end
 
-function _M:on_enter()
+function _M.on_enter(self)
 	client.push(self, "player_heros", {list = {{id = 111, level = 1}}})
 end
 
 ------------------------------------------
 -- 服务协议
-function _M:start(mode, ...)
+function _M.start(self, mode, ...)
 	-- body
 	self.mode = mode
 
@@ -109,10 +109,10 @@ end
 
 ------------------------------------------
 -- 房间协议
-function _M:create()
+function _M.create()
 end
 
-function _M:join(uid, agent, name, sex, secret, fd, ...)
+function _M.join(uid, agent, name, sex, secret, fd, ...)
 	-- body
 	local obj = objmgr.new_obj()
 	obj.uid = uid

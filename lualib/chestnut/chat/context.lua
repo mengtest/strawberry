@@ -1,22 +1,17 @@
 local skynet = require "skynet"
-local sd = require "skynet.sharedata"
+local sd = require "skynet.sharetable"
+local savedata = require "savedata"
 local snowflake = require "chestnut.snowflake"
-local log = require "chestnut.skynet.log"
-local zset = require "chestnut.zset"
-local query = require "chestnut.query"
-local sysmaild = require "sysmaild"
 local client = require "client"
-local CH = client.request()
+local log = require "chestnut.skynet.log"
 local _M = {}
 
 skynet.init(
 	function()
-		-- body
 	end
 )
 
-function _M:on_data_init(dbData)
-	-- body
+function _M.on_data_init(self, dbData)
 	assert(dbData ~= nil)
 	assert(dbData.db_users ~= nil)
 	assert(#dbData.db_users == 1)
@@ -24,8 +19,7 @@ function _M:on_data_init(dbData)
 	return true
 end
 
-function _M:on_data_save(dbData)
-	-- body
+function _M.on_data_save(self, dbData)
 	assert(dbData ~= nil)
 
 	return true

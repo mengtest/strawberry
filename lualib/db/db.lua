@@ -32,11 +32,6 @@ end
 
 ------------------------------------------
 -- read data
-function QUERY.read_sysmail()
-	-- body
-	local res = db_read.read_sysmail(ctx)
-	return res
-end
 
 function QUERY.read_account_by_username(username, password)
 	-- body
@@ -50,19 +45,28 @@ function QUERY.read_account_by_username(username, password)
 	return res
 end
 
+function QUERY.read_auth_by_openid(openid)
+end
+
 function QUERY.read_user(uid)
-	-- body
 	local res = {}
 	res.db_users = db_read.read_users_by_uid(ctx, uid)
 	res.db_user_rooms = db_read.read_user_rooms(ctx, uid)
-	res.db_user_packages = db_read.read_user_packages(ctx, uid)
+	res.db_user_items = db_read.read_user_packages(ctx, uid)
 	res.db_user_funcopens = db_read.read_user_funcopens(ctx, uid)
 	res.db_user_heros = db_read.read_user_heros(ctx, uid)
+	res.db_user_friends = db_read.read_user_friends(ctx, uid)
+	res.db_user_friend_reqs = db_read.read_user_friend_reqs(ctx, uid)
+	return res
+end
+
+function QUERY.read_sysmail()
+	local res = {}
+	res.db_sysmails = db_read.read_sysmail(ctx)
 	return res
 end
 
 function QUERY.read_room_mgr()
-	-- body
 	local res = {}
 	res.db_users = db_read.read_room_mgr_users(ctx)
 	res.db_rooms = db_read.read_room_mgr_rooms(ctx)
@@ -70,7 +74,6 @@ function QUERY.read_room_mgr()
 end
 
 function QUERY.read_room(id)
-	-- body
 	local res = {}
 	res.db_rooms = db_read.read_room(ctx, id)
 	res.db_users = db_read.read_room_users(ctx, id)
@@ -89,18 +92,23 @@ function QUERY.write_account(db_account)
 	db_write.write_account(ctx, db_account)
 end
 
+function QUERY.write_auth(data)
+end
+
 function QUERY.write_union(db_union)
-	-- body
 end
 
 function QUERY.write_user(data)
-	-- body
 	db_write.write_user(ctx, data.db_user)
 	db_write.write_user_room(ctx, data.db_user_room)
-	db_write.write_user_package(ctx, data.db_user_package)
+	db_write.write_user_package(ctx, data.db_user_items)
 	db_write.write_user_funcopen(ctx, data.db_user_funcopens)
 	db_write.write_user_achievement(ctx, data.db_user_achievements)
 	db_write.write_user_heros(ctx, data.db_user_heros)
+	db_write.write_user_friends(ctx, data.db_user_friends)
+end
+
+function QUERY.write_sysmail()
 end
 
 function QUERY.write_room_mgr(data)

@@ -1,7 +1,7 @@
 local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
 local PackageType = require "enum.PackageType"
-local ds = require "skynet.datasheet"
+local sd = require "skynet.sharetable"
 local _M = {}
 
 skynet.init(
@@ -9,8 +9,10 @@ skynet.init(
 	end
 )
 
-function _M:_increase(pt, id, num)
-	-- body
+local function push_items(obj)
+end
+
+function _M._increase(self, pt, id, num)
 	local uid = self.agentContext.uid
 	local index = self.context:get_entity_index(UserComponent)
 	local entity = index:get_entity(uid)
@@ -25,8 +27,7 @@ function _M:_increase(pt, id, num)
 	return true
 end
 
-function _M:_decrease(pt, id, num)
-	-- body
+function _M._decrease(self, pt, id, num)
 	local uid = self.agentContext.uid
 	local index = self.context:get_entity_index(UserComponent)
 	local entity = index:get_entity(uid)
@@ -46,17 +47,12 @@ function _M:_decrease(pt, id, num)
 	return true
 end
 
-function _M:set_agent_systems(systems)
-	-- body
-	self.agentSystems = systems
-end
-
-function _M:on_data_init(dbData)
-	-- body
-	assert(dbData ~= nil)
-	assert(dbData.db_user_packages ~= nil and #dbData.db_user_packages >= 0)
-	-- common package
-	local set = dbData.db_user_packages
+function _M.on_data_init(self, dbData)
+	if not dbData or not dbData.db_user_items then
+		log.error("bag is nil")
+		return
+	end
+	local set = dbData.db_user_items
 	local package = {}
 	for _, db_item in pairs(set) do
 		local item = {}
@@ -66,37 +62,34 @@ function _M:on_data_init(dbData)
 		item.updateAt = assert(db_item.update_at)
 		package[tonumber(item.id)] = item
 	end
-	self.dbPackages = {}
-	self.dbPackages[PackageType.COMMON] = package
+	self.mod_bag = {bags = {}}
+	self.mod_bag.bags[PackageType.COMMON] = package
 end
 
-function _M:on_data_save(dbData, ...)
-	-- body
-	assert(dbData ~= nil)
-	-- local set = self.dbPackages[PackageType.COMMON]
-	-- local package = {}
-	-- for _,db_item in pairs(set) do
-	-- 	local item = {}
-	-- 	item.uid = self.agentContext.uid
-	-- 	item.id = assert(db_item.id)
-	-- 	item.num = assert(db_item.num)
-	-- 	item.create_at = assert(db_item.createAt)
-	-- 	item.update_at = assert(db_item.updateAt)
-	-- 	package[tonumber(item.id)] = item
-	-- end
-	-- dbData.db_user_package = package
+function _M.on_data_save(self, dbData)
+	dbData.db_user_items = {}
+	local set = self.mod_bag.bags[PackageType.COMMON]
+	local package = {}
+	for _, db_item in pairs(set) do
+		local item = {}
+		item.uid = self.uid
+		item.id = assert(db_item.id)
+		item.num = assert(db_item.num)
+		item.create_at = assert(db_item.createAt)
+		item.update_at = assert(db_item.updateAt)
+		table.insert(package, item)
+	end
+	dbData.db_user_items = package
 end
 
-function _M:on_enter()
-	-- body
+function _M.on_enter(self)
+	push_items(self)
 end
 
-function _M:on_exit()
-	-- body
+function _M.on_exit(self)
 end
 
-function _M:on_func_open()
-	-- body
+function _M.on_func_open(self)
 	local uid = self.agentContext.uid
 	local index = self.context:get_entity_index(UserComponent)
 	local entity = index:get_entity(uid)
@@ -108,9 +101,8 @@ function _M:on_func_open()
 	entity.package.packages[PackageType.COMMON][4] = {id = 4, num = 100, createAt = os.time(), updateAt = os.time()} -- 门票
 end
 
-function _M:check_consume(id, value)
-	-- body
-	local uid = self.agentContext.uid
+function _M.check_consume(self, id, value)
+	local uid = self.uid
 	local index = self.context:get_entity_index(UserComponent)
 	local entity = index:get_entity(uid)
 	local itemConfig = ds.query("item")[string.format("%d", id)]
@@ -123,8 +115,7 @@ function _M:check_consume(id, value)
 	return true
 end
 
-function _M:consume(id, value)
-	-- body
+function _M.consume(self, id, value)
 	if not self:check_consume(id, value) then
 		return false
 	end
@@ -132,8 +123,7 @@ function _M:consume(id, value)
 	return self:_decrease(itemConfig.type, id, value)
 end
 
-function _M:rcard_num()
-	-- body
+function _M.rcard_num(self)
 	local uid = self.agentContext.uid
 	local index = self.context:get_entity_index(UserComponent)
 	local entity = index:get_entity(uid)
@@ -147,8 +137,7 @@ function _M:rcard_num()
 	return item.num
 end
 
-function _M:package_info()
-	-- body
+function _M.package_info(self)
 	local uid = self.agentContext.uid
 	local index = self.context:get_entity_index(UserComponent)
 	local entity = index:get_entity(uid)

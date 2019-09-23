@@ -1,21 +1,18 @@
 local skynet = require "skynet"
-local savedata = require("savedata")
-local log = require "chestnut.skynet.log"
 local service = require "service"
-local client = require "client"
+local log = require "chestnut.skynet.log"
+local context = require "chestnut.chat_mgr.context"
 local traceback = debug.traceback
 local assert = assert
-
-local users = {} -- 全服聊天
-local rooms = {} -- 房间聊天
 local CMD = {}
 
 function CMD.start()
-	-- body
+	context.init()
 	return true
 end
 
 function CMD.init_data()
+	-- context.on_data_init()
 	return true
 end
 
@@ -24,30 +21,25 @@ function CMD.sayhi()
 end
 
 function CMD.close()
-	-- body
 	return true
 end
 
 function CMD.kill()
-	-- body
 	skynet.exit()
 end
 
 ------------------------------------------
 -- 签到
-function CMD.checkin(uid, agent)
-	-- body
+function CMD.login(uid, agent)
 	local u = {
 		uid = uid,
 		agent = agent
 	}
-	users[uid] = u
+	context.login(u)
 end
 
 function CMD.afk(uid)
-	-- body
-	assert(users[uid])
-	users[uid] = nil
+	context.afk(uid)
 end
 
 ------------------------------------------
@@ -115,16 +107,6 @@ function CMD.room_recycle(room_id)
 end
 
 function CMD.say(from, to, word)
-	if rooms[to] then
-		local room = rooms[to]
-		for _, v in pairs(room) do
-			if users[v] then
-				skynet.send(users[v].agent, "lua", "say", from, word)
-			end
-		end
-	elseif users[to] then
-		skynet.send(users[to].agent, "lua", "say", from, word)
-	end
 end
 
 return CMD

@@ -54,4 +54,7 @@ function REQUEST:modify_name(args)
 	return res
 end
 
+function REQUEST:rank_power(args)
+end
+
 return REQUEST

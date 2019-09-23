@@ -6,11 +6,9 @@ local zset = require "chestnut.zset"
 local query = require "chestnut.query"
 local sysmaild = require "sysmaild"
 local client = require "client"
-local CH = client.request()
 local _M = {}
 
 local function send_inbox_list(obj, ...)
-	-- body
 	local l = {}
 	for _, v in pairs(self._mk) do
 		if v.viewed.value == 0 then
@@ -36,19 +34,25 @@ skynet.init(
 )
 
 function _M:on_data_init(dbData)
+	local db_friends = dbData.db_friends
+	for _, db_item in pairs(db_friends) do
+		local item = {}
+		item.id = assert(db_item.id)
+		item.num = assert(db_item.num)
+		item.createAt = assert(db_item.create_at)
+		item.updateAt = assert(db_item.update_at)
+		package[tonumber(item.id)] = item
+	end
 end
 
 function _M:on_data_save(dbData)
-	-- body
 end
 
-function _M:on_enter(...)
-	-- body
+function _M:on_enter()
 	send_inbox_list(self)
 end
 
-function _M:on_exit(...)
-	-- body
+function _M:on_exit()
 end
 
 function _M:add(mail, ...)
@@ -100,7 +104,7 @@ function _M:send_inbox(id, ...)
 	self.context:send_request("inbox", args)
 end
 
-function CH:fetch(args)
+function _M:fetch(args)
 	-- body
 	log.info("sysinbox fetch")
 	local res = {}
@@ -121,7 +125,7 @@ function CH:fetch(args)
 	return res
 end
 
-function CH:sync(args)
+function _M:sync(args)
 	-- body
 	log.info("sysinbox sync")
 	local res = {}
@@ -142,7 +146,7 @@ function CH:sync(args)
 	return res
 end
 
-function CH:viewed(args)
+function _M:viewed(args)
 	-- body
 	local mail = self._mk[args.mailid]
 	mail:set_viewed(1)

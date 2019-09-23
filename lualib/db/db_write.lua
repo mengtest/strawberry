@@ -23,7 +23,7 @@ function _M:write_room_mgr_rooms(db_rooms)
 		local sql =
 			string_format(
 			[==[CALL
-		sp_room_mgr_rooms_insert_or_update(%d, %d, '%s', %d, %d, %d);]==],
+			sp_room_mgr_rooms_insert_or_update(%d, %d, '%s', %d, %d, %d);]==],
 			db_room.id,
 			db_room.host,
 			db_room.users,
@@ -46,7 +46,7 @@ function _M:write_room_users(db_users)
 		local sql =
 			string_format(
 			[==[CALL
-		sp_room_users_insert_or_update(%d, %d, '%s', %d, %d);]==],
+			sp_room_users_insert_or_update(%d, %d, '%s', %d, %d);]==],
 			db_user.uid,
 			db_user.roomid,
 			db_user.state,
@@ -67,15 +67,13 @@ function _M:write_room(db_room)
 	local sql =
 		string_format(
 		[==[CALL
-		sp_room_insert_or_update(%d, %d, %d, %d, %d, '%s', %d, %d);]==],
+		sp_room_insert_or_update(%d, %d, %d, %d, %d, '%s');]==],
 		db_room.id,
 		db_room.type,
 		db_room.mode,
 		db_room.host,
 		db_room.open,
-		db_room.rule,
-		db_room.create_at,
-		db_room.update_at
+		db_room.rule
 	)
 	local res = self.db:query(sql)
 	if res.errno then
@@ -88,16 +86,8 @@ end
 function _M:write_zset(tname, data)
 	if tname == "power" then
 		for _, it in pairs(data) do
-			local sql =
-				string_format(
-				[==[CALL
-				sp_zset_power_insert_or_update(%d, %d, %d, %d, %d);]==],
-				it.id,
-				it.uid,
-				it.power,
-				it.create_at,
-				it.update_at
-			)
+			local sql = string_format([==[CALL
+				sp_zset_power_insert_or_update(%d, %d, %d);]==], it.id, it.uid, it.power)
 			local res = self.db:query(sql)
 			if res.errno then
 				log.error(sql)
@@ -129,7 +119,7 @@ function _M:write_user(db_user)
 	local sql =
 		string_format(
 		[==[CALL
-		sp_user_insert_or_update(%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, %d);]==],
+		sp_user_insert_or_update(%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d);]==],
 		db_user.uid,
 		db_user.sex,
 		db_user.nickname,
@@ -139,8 +129,6 @@ function _M:write_user(db_user)
 		db_user.headimg,
 		db_user.openid,
 		db_user.nameid,
-		db_user.create_at,
-		db_user.update_at,
 		db_user.login_at,
 		db_user.new_user,
 		db_user.level,
@@ -161,13 +149,11 @@ function _M:write_user_room(db_user_room)
 	local sql =
 		string_format(
 		[==[CALL
-		sp_user_room_insert_or_update(%d, %d, %d, %d, %d, %d, %d, %d);]==],
+		sp_user_room_insert_or_update(%d, %d, %d, %d, %d, %d);]==],
 		db_user_room.uid,
 		db_user_room.roomid,
 		db_user_room.created,
 		db_user_room.joined,
-		db_user_room.create_at,
-		db_user_room.update_at,
 		db_user_room.mode,
 		db_user_room.type
 	)
@@ -186,12 +172,10 @@ function _M:write_user_package(db_user_package)
 		local sql =
 			string_format(
 			[==[CALL
-			sp_user_package_insert_or_update(%d, %d, %d, %d, %d);]==],
+			sp_user_package_insert_or_update(%d, %d, %d);]==],
 			db_user_item.uid,
 			db_user_item.id,
-			db_user_item.num,
-			db_user_item.create_at,
-			db_user_item.update_at
+			db_user_item.num
 		)
 		-- log.info(sql)
 		local res = self.db:query(sql)
@@ -210,12 +194,10 @@ function _M:write_user_funcopen(db_user_funcopens)
 		local sql =
 			string_format(
 			[==[CALL
-		sp_user_funcopen_insert_or_update(%d, %d, %d, %d, %d);]==],
+			sp_user_funcopen_insert_or_update(%d, %d, %d);]==],
 			db_user_funcitem.uid,
 			db_user_funcitem.id,
-			db_user_funcitem.open,
-			db_user_funcitem.create_at,
-			db_user_funcitem.update_at
+			db_user_funcitem.open
 		)
 		-- log.info(sql)
 		local res = self.db:query(sql)
@@ -234,13 +216,11 @@ function _M:write_user_achievement(data)
 		local sql =
 			string_format(
 			[==[CALL
-		sp_user_achievement_insert_or_update(%d, %d, %d, %d, %d, %d);]==],
+			sp_user_achievement_insert_or_update(%d, %d, %d, %d);]==],
 			item.uid,
 			item.id,
 			item.reach,
-			item.recv,
-			item.create_at,
-			item.update_at
+			item.recv
 		)
 		-- log.info(sql)
 		local res = self.db:query(sql)
@@ -257,14 +237,45 @@ function _M:write_user_heros(data)
 	end
 	for _, item in ipairs(data) do
 		local sql =
+			string_format([==[CALL
+			sp_user_heros_insert_or_update(%d, %d, %d);]==], item.uid, item.hero_id, item.level)
+		local res = self.db:query(sql)
+		if res.errno then
+			log.error("%s", self.dump(res))
+			return false
+		end
+	end
+end
+
+function _M:write_user_friends(data)
+	if not data then
+		return
+	end
+	for _, item in ipairs(data) do
+		local sql =
+			string_format([==[CALL
+			sp_user_firends_insert_or_update(%d, %d, %d);]==], item.uid, item.hero_id, item.level)
+		local res = self.db:query(sql)
+		if res.errno then
+			log.error("%s", self.dump(res))
+			return false
+		end
+	end
+end
+
+function _M:write_user_friends(data)
+	if not data then
+		return
+	end
+	for _, item in ipairs(data) do
+		local sql =
 			string_format(
 			[==[CALL
-			sp_user_heros_insert_or_update(%d, %d, %d, %d, %d);]==],
-			item.uid,
-			item.hero_id,
-			item.level,
-			item.create_at,
-			item.update_at
+			sp_user_firend_reqs_insert_or_update(%d, %d, %d);]==],
+			item.id,
+			item.to_id,
+			item.from_id,
+			item.accept
 		)
 		local res = self.db:query(sql)
 		if res.errno then
@@ -281,11 +292,10 @@ function _M:write_offuser_room_created(db_user_room)
 	local sql =
 		string_format(
 		[==[CALL
-	sp_offuser_room_update_created(%d, %d, %d, %d, %d);]==],
+	sp_offuser_room_update_created(%d, %d, %d, %d);]==],
 		db_user_room.uid,
 		db_user_room.created,
 		db_user_room.joined,
-		db_user_room.update_at,
 		db_user_room.mode
 	)
 	-- log.info(sql)

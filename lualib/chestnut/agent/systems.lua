@@ -11,7 +11,7 @@ local table_insert = table.insert
 
 local Processors = {}
 
-function Processors:on_data_init(dbData)
+function Processors.on_data_init(self, dbData)
     log.info("on data init")
     user.on_data_init(self, dbData)
     ahievement.on_data_init(self, dbData)
@@ -21,8 +21,7 @@ function Processors:on_data_init(dbData)
     hero.on_data_init(self, dbData)
 end
 
-function Processors:on_data_save(dbData)
-    -- body
+function Processors.on_data_save(self, dbData)
     ahievement.on_data_save(self, dbData)
     FuncOpenSystem.on_data_save(self, dbData)
     PackageSystem.on_data_save(self, dbData)
@@ -31,20 +30,20 @@ function Processors:on_data_save(dbData)
     hero.on_data_save(self, dbData)
 end
 
-function Processors:on_enter()
+function Processors.on_enter(self)
     user.on_enter(self)
     FuncOpenSystem.on_enter(self)
     RoomSystem.on_enter(self)
     hero.on_enter(self)
 end
 
-function Processors:on_exit()
+function Processors.on_exit(self)
     RoomSystem.on_exit(self)
     FuncOpenSystem.on_exit(self)
     user.on_exit(self)
 end
 
-function Processors:on_new_day()
+function Processors.on_new_day(self)
 end
 
 return Processors

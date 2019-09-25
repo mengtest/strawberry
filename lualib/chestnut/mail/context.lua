@@ -36,29 +36,27 @@ skynet.init(
 	end
 )
 
-function _M:on_data_init(dbData)
+function _M.on_data_init(self, dbData)
 end
 
-function _M:on_data_save(dbData)
+function _M.on_data_save(self, dbData)
 end
 
-function _M:on_enter()
+function _M.on_enter(self)
 	send_inbox_list(self)
 end
 
-function _M:on_exit()
+function _M.on_exit(self)
 end
 
-function _M:add(mail, ...)
-	-- body
+function _M.add(self, mail)
 	table.insert(self._data, mail)
 	self._count = self._count + 1
 	self._mk[mail.mailid.value] = mail
 	self._mkzs:add(1, string.format("%d", mail.id.value))
 end
 
-function _M:poll(...)
-	-- body
+function _M.poll(self)
 	skynet.fork(
 		function(...)
 			-- body
@@ -82,8 +80,7 @@ function _M:poll(...)
 	)
 end
 
-function _M:send_inbox(id, ...)
-	-- body
+function _M.send_inbox(self, id, ...)
 	local v = assert(self._mk[id])
 	local l = {}
 	local mail = {}
@@ -98,8 +95,7 @@ function _M:send_inbox(id, ...)
 	self.context:send_request("inbox", args)
 end
 
-function _M:fetch(args)
-	-- body
+function _M.fetch(self, args)
 	log.info("sysinbox fetch")
 	local res = {}
 	res.errorcode = errorcode.SUCCESS
@@ -119,8 +115,7 @@ function _M:fetch(args)
 	return res
 end
 
-function _M:sync(args)
-	-- body
+function _M.sync(args)
 	log.info("sysinbox sync")
 	local res = {}
 	res.errorcode = errorcode.SUCCESS
@@ -140,8 +135,7 @@ function _M:sync(args)
 	return res
 end
 
-function _M:viewed(args)
-	-- body
+function _M.viewed(self, args)
 	local mail = self._mk[args.mailid]
 	mail:set_viewed(1)
 	local res = {}

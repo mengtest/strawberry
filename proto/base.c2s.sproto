@@ -31,6 +31,15 @@ modify_name 100 {
     }
 }
 
+user_info 101 {
+    request {
+        uid 0 : integer
+    }
+    response {
+        info 0 : base_info
+    }
+}
+
 ####################################### 
 # 聊天模块 [200, 250)
 say 200 {
@@ -40,6 +49,19 @@ say 200 {
     response {
         errorcode 0 : integer
         r         1 : string
+    }
+}
+
+####################################### 
+# 房间模块 [250, 300)
+fetch_room_info 250 {
+    response {
+        errorcode 0 : integer
+        isCreated 1 : boolean
+        joined    2 : boolean
+        roomid    3 : integer
+        type      4 : integer    # 此房间的类型
+        mode      5 : integer    # 此房间的模式
     }
 }
 
@@ -55,16 +77,6 @@ fetchinbox 300 {
     }
 }
 
-syncsysmail 301 {
-    request {
-        all       0 : *integer
-    }
-    response {
-        errorcode 0 : integer
-        inbox     1 : *mail
-    }
-}
-
 viewedmail 302 {
     request {
         mailid    0 : integer
@@ -74,9 +86,18 @@ viewedmail 302 {
     }
 }
 
+viewedmail_all 303 {
+    request {
+        mailid    0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
 ####################################### 
-# 签到模块 [350, 400)
-checkindaily 350 {
+# 每日签到模块 [350, 400)
+fetch_checkins 350 {
     response {
         errorcode 0 : integer
     }
@@ -84,7 +105,7 @@ checkindaily 350 {
 
 ####################################### 
 # 记录模块 [400, 450)
-record 400 {
+fetch_records 400 {
     request {
         id 0 : integer
     }
@@ -98,42 +119,109 @@ record 400 {
 # 成就模块 [450, 500)
 active_achievement 450 {
     request {
+        id 0 : integer
+    }
+}
+
+fetch_achievements 451 {
+    response {
+        errorcode 0 : integer
     }
 }
 
 #######################################
 # 功能模块 [500, 550)
+fetch_funcs 500 {
+    response {
+        errorcode 0 : integer
+    }
+}
+
+####################################### 
+# 英雄模块 [550, 600)
+fetch_heros 550 {
+    response {
+        errorcode 0 : integer
+        list 1 : *hero
+    }
+}
+
+fetch_hero 551 {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+        hero 1 : hero
+    }
+}
 
 ####################################### 
 # 好友模块 [600, 650)
-friend_fetch 600 {
+fetch_friend 600 {
     request {
+        friend_uid 0 : integer
     }
     response {
         errorcode 0 : integer
     }
 }
 
-friend_rm 601 {
-    request {}
-    response {
-        errorcode 0 : integer
-    }
-}
-
-friend_add_req 602 {
+rm_friend 601 {
     request {
-        who 0 : integer
+        friend_uid 0 : integer
     }
     response {
         errorcode 0 : integer
     }
 }
 
-friend_add 603 {
+add_friend_req 602 {
     request {
-        who 0 : integer
+        friend_uid 0 : integer
     }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+fetch_friends 604 {
+    response {
+        errorcode 0 : integer
+    }
+}
+
+fetch_friend_reqs 605 {
+    response {
+        errorcode 0 : integer
+    }
+}
+
+acc_friend_req 606 {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+rej_friend_req 607 {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+acc_friend_req_all 608 {
+    response {
+        errorcode 0 : integer
+    }
+}
+
+rej_friend_req_all 609 {
     response {
         errorcode 0 : integer
     }
@@ -141,7 +229,7 @@ friend_add 603 {
 
 ####################################### 
 # 排行榜模块 [650, 700)
-rank_power 650 {
+fetch_rank_power 650 {
     request {
     }
     response {
@@ -150,11 +238,52 @@ rank_power 650 {
     }
 }
 
+fetch_rank_team 651 {
+}
+
 ####################################### 
 # 每日任务模块 [700, 750)
-taskdaily_fetch 700 {
+fetch_dailytasks 700 {
     response {
         errorcode 0 : integer
         tasks 1 : *taskdaily
+    }
+}
+
+
+####################################### 
+# 战队模块 [750, 800)
+fetch_teams {
+    response {
+        errorcode 0 : integer
+        teams 1 : *team
+    }
+}
+
+fetch_team {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+        team 1 : team
+    }
+}
+
+create_team {
+    request {
+        fake 0 : team
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+join_team {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
     }
 }

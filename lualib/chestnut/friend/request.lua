@@ -10,30 +10,44 @@ local assert = assert
 local REQUEST = client.request()
 local traceback = debug.traceback
 
-function REQUEST:fetch_friends(args)
+function REQUEST.fetch_friends(self, args)
 	local obj = self.obj
-	return context.fetch(self, args)
+	return context.fetch_friends(self, args)
 end
 
-function REQUEST:rm_friend(args)
+function REQUEST.fetch_friend(self, args)
 	local obj = self.obj
-	return context.sync(self, args)
+	return context.fetch_friend(obj, args)
 end
 
-function REQUEST:fetch_friend_reqs(args)
+function REQUEST.rm_friend(self, args)
 	local obj = self.obj
+	return context.rm_friend(self, args)
 end
 
-function REQUEST:acc_friend_req(args)
+function REQUEST.fetch_friend_reqs(self, args)
+	local obj = self.obj
+	return context.fetch_friend_reqs(self, args)
 end
 
-function REQUEST:rej_friend_req(args)
+function REQUEST.acc_friend_req(self, args)
+	local obj = self.obj
+	return context.acc_friend_req(obj, args)
 end
 
-function REQUEST:acc_friend_req_all(args)
+function REQUEST.rej_friend_req(self, args)
+	local obj = self.obj
+	return context.rej_friend_req(obj, args)
 end
 
-function REQUEST:rej_friend_req_all(args)
+function REQUEST.acc_friend_req_all(self, args)
+	local obj = self.obj
+	return context.acc_friend_req_all(obj, args)
+end
+
+function REQUEST.rej_friend_req_all(self, args)
+	local obj = self.obj
+	return context.rej_friend_req_all(obj, args)
 end
 
 return REQUEST

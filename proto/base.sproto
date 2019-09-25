@@ -61,3 +61,16 @@
     id 0 : integer
     finished 1 : integer
 }
+
+.base_info {
+    num      0 : integer
+    nickname 1 : string
+    nameid 2 : string
+    rcard 3 : integer
+    level 4 : integer
+}
+
+.team {
+    id 0 : integer
+    name 1 : string
+}

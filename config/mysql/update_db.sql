@@ -103,6 +103,25 @@ IF lastVersion < 7 THEN
 	SET versionNotes = 'add tb_user_friend_reqs';
 END IF;
 
+IF lastVersion < 8 THEN
+	DROP TABLE IF EXISTS `tb_teams`;
+	CREATE TABLE `tb_user_friend_reqs` (
+		`id`  bigint(20) NOT NULL,
+		`name` varchar(32) NOT NULL,
+		`simple` varchar(255) NOT NULL,
+		`power` int(11) NOT NULL,
+		`join_tp` int(11) NOT NULL,
+		`join_cond` varchar(255) NOT NULL,
+		`members` blob NOT NULL,
+		`create_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  		`update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		PRIMARY KEY (`uid`, `friend_uid`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='英雄角色';
+
+	SET lastVersion = 8;
+	SET versionNotes = 'add tb_teams';
+END IF;
+
 IF lastVersion > lastVersion1 THEN
 	INSERT INTO tb_database_version(version, update_date, last_sql) values(lastVersion, now(), versionNotes);
 END IF;
@@ -317,6 +336,36 @@ BEGIN
 	INSERT INTO tb_user_friend_reqs(id, to_uid, from_uid, accept)
 	VALUES (in_id, in_to_uid, in_friend_uid, in_accept)
 	ON DUPLICATE KEY UPDATE id=in_id, to_uid=in_to_uid, from_uid=in_friend_uid, accept=in_accept;
+END;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for sp_teams_select
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `sp_teams_select`;
+DELIMITER ;;
+CREATE PROCEDURE `sp_teams_select`()
+BEGIN
+	SELECT * FROM tb_teams;
+END;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for sp_teams_insert_or_update
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `sp_teams_insert_or_update`;
+DELIMITER ;;
+CREATE PROCEDURE `sp_teams_insert_or_update`(IN `in_id` bigint(20),
+	IN `in_name` varchar(32),
+	IN `in_simple` varchar(255),
+	IN `in_power` int(11),
+	IN `in_join_tp` int(11),
+	IN `in_join_cond` varchar(255),
+	IN `in_members` blob,
+BEGIN
+	INSERT INTO tb_teams(id, name, simple, power, join_tp, join_cond, members)
+	VALUES (in_id, in_name, in_simple, in_power, in_join_tp, in_join_cond, in_members)
+	ON DUPLICATE KEY UPDATE id=in_id, name=in_name, simple=in_simple, power=in_power, join_tp=in_join_tp, join_cond=in_join_cond, members=in_members;
 END;;
 DELIMITER ;
 

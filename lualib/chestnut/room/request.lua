@@ -24,13 +24,12 @@ end
 
 ------------------------------------------
 -- 麻将协议
-function REQUEST:match(args)
+function REQUEST.match(self, args)
 	local obj = self.obj
 	return room:match(args)
 end
 
 function REQUEST:create(args)
-	-- body
 	local obj = self.obj
 	return room.create(obj, args)
 end

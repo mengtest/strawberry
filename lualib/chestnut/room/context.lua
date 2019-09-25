@@ -235,7 +235,6 @@ end
 
 -- called by room
 function _M:roomover()
-	-- body
 	self.mod_room.id = 0
 	self.mod_room.joined = false
 	self.mod_room.isCreated = false
@@ -243,7 +242,6 @@ function _M:roomover()
 end
 
 function _M:forward_room(name, args)
-	-- body
 	if self.mod_room.joined then
 		local cmd = "on_" .. name
 		local addr = self.addr
@@ -257,7 +255,6 @@ function _M:forward_room(name, args)
 end
 
 function _M:forward_room_rsp(name, args)
-	-- body
 	if self.mod_room.joined then
 		local cmd = name
 		local addr = self.addr

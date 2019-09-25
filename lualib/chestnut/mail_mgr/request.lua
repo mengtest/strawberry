@@ -10,16 +10,16 @@ local assert = assert
 local REQUEST = client.request()
 local traceback = debug.traceback
 
-function REQUEST:fetchinbox(args)
-	return context.fetch(self, args)
+function REQUEST.fetchinbox(self, args)
+	return context.fetch(self.obj, args)
 end
 
-function REQUEST:syncsysmail(args)
-	return context.sync(self, args)
+function REQUEST.syncsysmail(self, args)
+	return context.sync(self.obj, args)
 end
 
-function REQUEST:viewedsysmail(args)
-	return context.viewed(self, args)
+function REQUEST.viewedsysmail(self, args)
+	return context.viewed(self.obj, args)
 end
 
 return REQUEST

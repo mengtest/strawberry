@@ -10,7 +10,4 @@ local assert = assert
 local REQUEST = client.request()
 local traceback = debug.traceback
 
-function REQUEST:say(args)
-end
-
 return REQUEST

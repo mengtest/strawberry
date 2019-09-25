@@ -2,8 +2,7 @@ local skynet = require "skynet"
 local sd = require "skynet.sharedata"
 local snowflake = require "chestnut.snowflake"
 local log = require "chestnut.skynet.log"
-local zset = require "chestnut.zset"
-local query = require "chestnut.query"
+local agent_mgr = require "chestnut.agent_mgr.c"
 local sysmaild = require "sysmaild"
 local client = require "client"
 local _M = {}
@@ -33,7 +32,7 @@ skynet.init(
 	end
 )
 
-function _M:on_data_init(dbData)
+function _M.on_data_init(self, dbData)
 	local db_friends = dbData.db_friends
 	for _, db_item in pairs(db_friends) do
 		local item = {}
@@ -45,114 +44,46 @@ function _M:on_data_init(dbData)
 	end
 end
 
-function _M:on_data_save(dbData)
+function _M.on_data_save(self, dbData)
 end
 
-function _M:on_enter()
+function _M.on_enter(self)
 	send_inbox_list(self)
 end
 
-function _M:on_exit()
+function _M.on_exit(self)
 end
 
-function _M:add(mail, ...)
-	-- body
-	table.insert(self._data, mail)
-	self._count = self._count + 1
-	self._mk[mail.mailid.value] = mail
-	self._mkzs:add(1, string.format("%d", mail.id.value))
+function _M.fetch_friends(obj, args)
+	return {errorcode = 0}
 end
 
-function _M:poll(...)
-	-- body
-	skynet.fork(
-		function(...)
-			-- body
-			-- local res
-			-- if self._count > 0 then
-			-- 	res = sysmaild.poll(self._mkzs:range(self._mkzs:count() - 1, self._mkzs:count())[1])
-			-- else
-			-- 	res = sysmaild.poll(0)
-			-- end
-			-- log.info("sysinbox poll %d", #res)
-			-- for _,mailid in pairs(res) do
-			-- 	local i = sysmail.new(self._env, self._dbctx, self)
-			-- 	i.id.value = snowflake.next_id()
-			-- 	i.uid.value = self._env._suid
-			-- 	i.mailid.value = math.tointeger(mailid)
-			-- 	i.viewed.value = 0
-			-- 	i:insert_cache()
-			-- 	self:add(i)
-			-- end
-		end
-	)
+function _M.fetch_friend(obj, args)
+	local friend_uid = args.friend_uid
 end
 
-function _M:send_inbox(id, ...)
-	-- body
-	local v = assert(self._mk[id])
-	local l = {}
-	local mail = {}
-	mail.id = v.mailid
-	mail.viewed = v.viewed
-	mail.title = t.title
-	mail.content = t.content
-	mail.datetime = t.datetime
-	table.insert(l, mail)
-	local args = {}
-	args.l = l
-	self.context:send_request("inbox", args)
+function _M.rm_friend(obj, args)
+	local friend_uid = args.friend_uid
 end
 
-function _M:fetch(args)
-	-- body
-	log.info("sysinbox fetch")
-	local res = {}
-	res.errorcode = errorcode.SUCCESS
-	res.inbox = {}
-	for k, v in pairs(self._mk) do
-		if v.viewed.value == 0 then
-			local mail = {}
-			mail.id = v.mailid.value
-			mail.viewed = v.viewed.value
-			local t = sd.query(string.format("%s:%d", self._tname, v.mailid))
-			mail.title = t.title
-			mail.content = t.content
-			mail.datetime = t.datetime
-			table.insert(res.inbox, mail)
-		end
-	end
-	return res
+-- 向朋友发出请求
+function _M.add_friend_req(obj, args)
 end
 
-function _M:sync(args)
-	-- body
-	log.info("sysinbox sync")
-	local res = {}
-	res.errorcode = errorcode.SUCCESS
-	res.inbox = {}
-	for k, v in pairs(self._data) do
-		if v.viewed.value == 0 then
-			local mail = {}
-			mail.id = v.mailid.value
-			mail.datetime = v.datetime.value
-			mail.viewed = v.viewed.value
-			local t = sd.query(string.format("tg_sysmail:%d", v.mailid.value))
-			mail.title = t.title
-			mail.content = t.content
-			table.insert(res.inbox, mail)
-		end
-	end
-	return res
+-- 自己的好友请求
+function _M.fetch_friend_reqs(obj, args)
 end
 
-function _M:viewed(args)
-	-- body
-	local mail = self._mk[args.mailid]
-	mail:set_viewed(1)
-	local res = {}
-	res.errorcode = errorcode.SUCCESS
-	return res
+function _M.acc_friend_req(obj, args)
+end
+
+function _M.rej_friend_req(obj, args)
+end
+
+function _M.acc_friend_req_all(obj, args)
+end
+
+function _M.rej_friend_req_all(obj, args)
 end
 
 return _M

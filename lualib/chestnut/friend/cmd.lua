@@ -45,18 +45,8 @@ local CMD = require "cmd"
 
 ------------------------------------------
 -- gameplay 协议
-function CMD:query(session)
+function CMD.add_friend_req(obj, args)
 	return self:query(session)
-end
-
-function CMD:born(session, ...)
-	-- body
-	return self:born(session, ...)
-end
-
-function CMD:opcode(session, args, ...)
-	-- body
-	return self:opcode(session, args, ...)
 end
 
 return CMD

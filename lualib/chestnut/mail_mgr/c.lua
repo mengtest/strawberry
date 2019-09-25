@@ -16,19 +16,16 @@ skynet.init(
 )
 
 function _M.poll(dt, ...)
-	-- body
 	return skynet.call(".SYSEMAIL", "lua", "poll", dt)
 end
 
 function _M.get(id, ...)
-	-- body
 	return skynet.call(".SYSEMAIL", "lua", "get", id)
 end
 
-function _M.call_init_rooms( ... )
-    -- body
-    local handle = get_address()
-    return skynet.call(handle, 'init_rooms', ...)
+function _M.call_init_rooms(...)
+	local handle = get_address()
+	return skynet.call(handle, "init_rooms", ...)
 end
 
 return _M

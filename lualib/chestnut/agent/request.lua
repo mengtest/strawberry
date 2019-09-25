@@ -11,7 +11,7 @@ local assert = assert
 local REQUEST = client.request()
 local traceback = debug.traceback
 
-function REQUEST:handshake()
+function REQUEST.handshake(self)
 	-- body
 	-- skynet.error('handshake')
 	-- log.info("test handshake")
@@ -22,7 +22,7 @@ function REQUEST:handshake()
 	return res
 end
 
-function REQUEST:enter()
+function REQUEST.enter(self)
 	local ok, err = xpcall(AgentSystems.on_enter, traceback, self.obj)
 	if not ok then
 		log.error(err)
@@ -31,7 +31,7 @@ function REQUEST:enter()
 	return {errorcode = 0}
 end
 
-function REQUEST:logout()
+function REQUEST.logout(self)
 	-- body
 	local res = {}
 	if logout.logout(self) == servicecode.SUCCESS then
@@ -44,7 +44,7 @@ end
 
 ------------------------------------------
 -- 系统模块
-function REQUEST:modify_name(args)
+function REQUEST.modify_name(self, args)
 	local obj = self.obj
 	obj.mod_user.nickname = args.nickname
 	log.info("uid(%d) REQUEST = [modify_name], nickname = [%s]", obj.uid, obj.mod_user.nickname)
@@ -54,7 +54,7 @@ function REQUEST:modify_name(args)
 	return res
 end
 
-function REQUEST:rank_power(args)
+function REQUEST.rank_power(self, args)
 end
 
 return REQUEST

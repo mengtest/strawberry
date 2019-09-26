@@ -2,6 +2,7 @@ local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
 local PackageType = require "enum.PackageType"
 local sd = require "skynet.sharetable"
+local objmgr = require "objmgr"
 local _M = {}
 
 skynet.init(

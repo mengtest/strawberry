@@ -10,9 +10,4 @@ local assert = assert
 local REQUEST = client.request()
 local traceback = debug.traceback
 
-function REQUEST.fetch_taskdailys(self, args)
-	local obj = self.obj
-	return context.fetch(obj, args)
-end
-
 return REQUEST

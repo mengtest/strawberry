@@ -4,7 +4,6 @@ local log = require "chestnut.skynet.log"
 local sproto = require "sproto"
 local sprotoloader = require "sprotoloader"
 local servicecode = require "enum.servicecode"
-local objmgr = require "objmgr"
 local assert = assert
 local string_pack = string.pack
 local max = 2 ^ 16 - 1
@@ -90,15 +89,8 @@ skynet.register_protocol {
 		skynet.ignoreret()
 		if type == "REQUEST" then
 			-- local fd = session
-			local ctx = {}
-			local obj = assert(objmgr.get_by_fd(fd))
-			ctx.obj = obj
-			assert(obj.fd == fd)
-			for _, v in pairs(_middlewares) do
-				v(ctx, ...)
-			end
 			local traceback = debug.traceback
-			local ok, result = xpcall(request, traceback, ctx, ...)
+			local ok, result = xpcall(request, traceback, fd, ...)
 			if ok then
 				if result then
 					if login_type == "so" then

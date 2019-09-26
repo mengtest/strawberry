@@ -1,7 +1,7 @@
 local skynet = require "skynet"
 local client = require "client"
 local service = require "service"
-local command = require 'command'
+local command = require "cmd"
 require "chestnut.agent.context"
 require "chestnut.agent.request"
 require "chestnut.agent.response"
@@ -13,9 +13,7 @@ client.init(client_mod)
 
 local mod = {}
 mod.require = {}
-mod.init = function ( ... )
-	-- body
+mod.init = function()
 end
-mod.command = command.cmd()
+mod.command = command
 service.init(mod)
-

@@ -1,5 +1,5 @@
 local service = require "service"
-local CMD = require "chestnut.mail_mgr.cmd"
+local CMD = require "cmd"
 service.init {
 	command = CMD
 }

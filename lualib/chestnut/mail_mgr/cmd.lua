@@ -5,12 +5,13 @@ local zset = require "zset"
 local json = require "rapidjson"
 local savedata = require "savedata"
 local service = require "service"
+local CMD = require "cmd"
 local traceback = debug.traceback
 local assert = assert
 local users = {}
 local rooms = {}
 local zs = zset.new()
-local CMD = {}
+
 local subscribe = {}
 
 local function save_data()
@@ -41,10 +42,10 @@ skynet.init(
 )
 
 function subscribe.save_data()
-    -- save_data()
+    save_data()
 end
 
-function CMD:start()
+function CMD.start()
     savedata.init {
         command = subscribe
     }
@@ -52,7 +53,7 @@ function CMD:start()
     return true
 end
 
-function CMD:init_data()
+function CMD.init_data()
     -- body
     -- local pack = redis:get("tb_sysmail")
     -- if pack then
@@ -73,18 +74,17 @@ function CMD:init_data()
     return true
 end
 
-function CMD:sayhi()
+function CMD.sayhi()
     -- 初始化各种全服信息
     return true
 end
 
-function CMD:close(...)
+function CMD.close()
     save_data()
     return true
 end
 
-function CMD:kill(...)
-    -- body
+function CMD.kill()
     skynet.exit()
 end
 
@@ -121,38 +121,8 @@ function CMD:afk(uid, ...)
     users[uid] = nil
 end
 
-function CMD:new_mail(title, content, appendix, to, ...)
+function CMD.new_mail(title, content, appendix, to, ...)
     -- body
-    local now = skynet.time()
-    local mail = {}
-    mail.id = guid()
-    mail.sender = 1
-    mail.to = to
-    mail.create_time = now
-    mail.title = title
-    mail.content = content
-    mail.appendix = appendix
-    zs:add(mail.id, mail)
-    assert(to >= 0)
-    if to == 0 then
-        -- 所有人
-        for _, v in pairs(users) do
-            skynet.send(v.agent, "lua", "new_mail", mail)
-        end
-    elseif rooms[to] then
-        local room = rooms[to]
-        for _, v in pairs(room) do
-            if users[v] then
-                skynet.send(v.agent, "lua", "new_mail", mail)
-            end
-        end
-    elseif users[to] then
-        if users[to] then
-            local u = users[to]
-            skynet.send(u.agent, "lua", "new_mail", mail)
-        end
-    end
-    return service.NORET
 end
 
 return CMD

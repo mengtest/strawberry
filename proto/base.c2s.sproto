@@ -253,14 +253,14 @@ fetch_dailytasks 700 {
 
 ####################################### 
 # 战队模块 [750, 800)
-fetch_teams {
+fetch_teams 750 {
     response {
         errorcode 0 : integer
         teams 1 : *team
     }
 }
 
-fetch_team {
+fetch_team 751 {
     request {
         id 0 : integer
     }
@@ -270,7 +270,7 @@ fetch_team {
     }
 }
 
-create_team {
+create_team 752 {
     request {
         fake 0 : team
     }
@@ -279,7 +279,34 @@ create_team {
     }
 }
 
-join_team {
+join_team 753 {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+####################################### 
+# 商店模块 [800, 850)
+
+fetch_store_items 800 {
+    response {
+        errorcode 0 : integer
+    }
+}
+
+fetch_store_item 801 {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+buy_store_item 802 {
     request {
         id 0 : integer
     }

@@ -1,8 +1,8 @@
 ####################################### 
-# 德州协议 [720, 800)
+# 德州协议 [40000, 50000)
 
 # 请求
-pokercall 720 {
+pokercall 40000 {
     request {
         idx       0 : integer
         opcode    1 : integer
@@ -14,7 +14,7 @@ pokercall 720 {
 }
 
 # 确认四个玩家都呈现完毕后，状态转移
-pokerstep 721 {
+pokerstep 40021 {
     request {
         idx       0 : integer
     }
@@ -23,7 +23,7 @@ pokerstep 721 {
     }
 }
 
-pokerrestart 722 {
+pokerrestart 40022 {
     request {
         idx       0 : integer
     }
@@ -32,7 +32,7 @@ pokerrestart 722 {
     }
 }
 
-pokerready 723 {
+pokerready 40023 {
     request {
         idx 0 : integer
     }
@@ -42,7 +42,7 @@ pokerready 723 {
     }
 }
 
-pokermatch 724 {
+pokermatch 40024 {
     request {
         mode 0 : integer
     }
@@ -51,7 +51,7 @@ pokermatch 724 {
     }
 }
 
-pokercreate 725 {
+pokercreate 40025 {
     request {
         provice    0 : integer
         ju         1 : integer
@@ -63,7 +63,7 @@ pokercreate 725 {
     }
 }
 
-pokerjoin 726 {
+pokerjoin 40026 {
     request {
         roomid 0 : integer
     }
@@ -78,7 +78,7 @@ pokerjoin 726 {
     }
 }
 
-pokerrejoin 727 {
+pokerrejoin 40027 {
     response {
         errorcode 0 : integer
         roomid    1 : integer
@@ -90,7 +90,7 @@ pokerrejoin 727 {
     }
 }
 
-pokerleave 728 {
+pokerleave 40028 {
     request {
         idx 0 : integer
     }
@@ -99,7 +99,7 @@ pokerleave 728 {
     }
 }
 
-pokerjoined 729 {
+pokerjoined 40029 {
     request {
         idx 0 : integer
     }

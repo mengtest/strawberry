@@ -1,8 +1,8 @@
 
 ####################################### 
-# 麻将协议 [500, 600)
+# 麻将协议 [30000, 40000)
 
-call 501 {
+call 30000 {
     request {
         op        0 : opinfo
     }
@@ -11,7 +11,7 @@ call 501 {
     }
 }
 
-# shuffle 502 {
+# shuffle 30002 {
 #     request {
 #         idx       0 : integer
 #     }
@@ -20,7 +20,7 @@ call 501 {
 #     }
 # }
 
-# dice 503 {
+# dice 30003 {
 #     request {
 #         idx       0 : integer
 #     }
@@ -31,7 +31,7 @@ call 501 {
 #     }
 # }
 
-lead 504 {
+lead 30004 {
     request {
         idx       0 : integer
         card      1 : integer
@@ -42,7 +42,7 @@ lead 504 {
     }
 }
 
-step 505 {
+step 30005 {
     request {
         idx       0 : integer
     }
@@ -51,7 +51,7 @@ step 505 {
     }
 }
 
-restart 506 {
+restart 30006 {
     request {
         idx       0 : integer
     }
@@ -60,7 +60,7 @@ restart 506 {
     }
 }
 
-# rchat 507 {
+# rchat 30007 {
 #     request {
 #         idx       0 : integer
 #         type      1 : integer
@@ -72,7 +72,7 @@ restart 506 {
 #     }
 # }
 
-xuanpao 508 {
+xuanpao 30008 {
     request {
         idx       0 : integer
         fen       1 : integer
@@ -82,7 +82,7 @@ xuanpao 508 {
     }
 }
 
-xuanque 509 {
+xuanque 30009 {
     request {
         idx       0 : integer
         que        1 : integer
@@ -92,7 +92,7 @@ xuanque 509 {
     }
 }
 
-ready 510 {
+ready 30010 {
     request {
         idx 0 : integer
     }
@@ -102,7 +102,7 @@ ready 510 {
     }
 }
 
-create 511 {
+create 30011 {
     request {
         provice    0 : integer
         ju         1 : integer
@@ -117,7 +117,7 @@ create 511 {
     }
 }
 
-join 512 {
+join 30012 {
     request {
         roomid 0 : integer
     }
@@ -132,7 +132,7 @@ join 512 {
     }
 }
 
-rejoin 513 {
+rejoin 20013 {
     response {
         errorcode 0 : integer
         roomid    1 : integer
@@ -144,7 +144,7 @@ rejoin 513 {
     }
 }
 
-leave 514 {
+leave 20014 {
     request {
         idx 0 : integer
     }

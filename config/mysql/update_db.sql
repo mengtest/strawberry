@@ -96,7 +96,7 @@ IF lastVersion < 7 THEN
 		`accept` int(11) NOT NULL,
 		`create_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   		`update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-		PRIMARY KEY (`uid`, `friend_uid`)
+		PRIMARY KEY (`uid`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='英雄角色';
 
 	SET lastVersion = 7;
@@ -115,11 +115,18 @@ IF lastVersion < 8 THEN
 		`members` blob NOT NULL,
 		`create_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   		`update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-		PRIMARY KEY (`uid`, `friend_uid`)
+		PRIMARY KEY (`id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='英雄角色';
 
 	SET lastVersion = 8;
 	SET versionNotes = 'add tb_teams';
+END IF;
+
+IF lastVersion < 9 THEN
+	ALTER TABLE `tb_user_friends` ADD `deled` int(11) NOT NULL;
+	
+	SET lastVersion = 9;
+	SET versionNotes = 'alter tb_user_friends';
 END IF;
 
 IF lastVersion > lastVersion1 THEN
@@ -291,9 +298,9 @@ END;;
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `sp_user_friends_select`;
 DELIMITER ;;
-CREATE PROCEDURE `sp_user_friends_select`()
+CREATE PROCEDURE `sp_user_friends_select`(IN `in_uid` bigint(20))
 BEGIN
-	SELECT * FROM tb_user_friends ;
+	SELECT * FROM tb_user_friends WHERE uid=in_uid AND deled=0;
 END;;
 DELIMITER ;
 
@@ -304,11 +311,12 @@ DROP PROCEDURE IF EXISTS `sp_user_firends_insert_or_update`;
 DELIMITER ;;
 CREATE PROCEDURE `sp_user_firends_insert_or_update`(IN `in_uid` bigint,
 	IN `in_friend_uid` bigint,
-	IN `in_alias` varchar(255))
+	IN `in_alias` varchar(255)
+	IN `in_deled` int(11))
 BEGIN
-	INSERT INTO tb_user_friends(uid, friend_uid, alias)
-	VALUES (in_uid, in_friend_uid, in_alias)
-	ON DUPLICATE KEY UPDATE uid=in_uid, friend_uid=in_friend_uid, alias=in_alias;
+	INSERT INTO tb_user_friends(uid, friend_uid, alias, deled)
+	VALUES (in_uid, in_friend_uid, in_alias, in_deled)
+	ON DUPLICATE KEY UPDATE uid=in_uid, friend_uid=in_friend_uid, alias=in_alias, deled=in_deled;
 END;;
 DELIMITER ;
 
@@ -319,7 +327,7 @@ DROP PROCEDURE IF EXISTS `sp_user_friend_reqs_select`;
 DELIMITER ;;
 CREATE PROCEDURE `sp_user_friend_reqs_select`(IN `in_uid` bigint)
 BEGIN
-	SELECT * FROM tb_user_friend_reqs WHERE to_uid=in_uid;
+	SELECT * FROM tb_user_friend_reqs WHERE to_uid=in_uid ADD accept=0;
 END;;
 DELIMITER ;
 

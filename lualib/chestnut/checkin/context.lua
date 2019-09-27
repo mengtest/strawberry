@@ -91,4 +91,7 @@ function _M.send_inbox(id, ...)
 	self.context:send_request("inbox", args)
 end
 
+function _M.fetch_checkins(fd, args)
+end
+
 return _M

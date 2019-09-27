@@ -1,6 +1,5 @@
 local skynet = require "skynet"
 local client = require "client"
-
 local RESPONSE = client.response()
 
 function RESPONSE.handshake(self, args)

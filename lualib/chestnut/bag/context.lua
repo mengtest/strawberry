@@ -4,9 +4,11 @@ local PackageType = require "enum.PackageType"
 local sd = require "skynet.sharetable"
 local objmgr = require "objmgr"
 local _M = {}
+local item_cfg
 
 skynet.init(
 	function()
+		item_cfg = sd.query("itemConfig")
 	end
 )
 
@@ -116,12 +118,36 @@ function _M.check_consume(self, id, value)
 	return true
 end
 
-function _M.consume(self, id, value)
+function _M.get_item(obj, id)
+	local bag = obj.mod_bag.bags[PackageType.COMMON]
+	local item = bag[id]
+	return item
+end
+
+function _M.get_fd_item(fd, id)
+	local obj = objmgr.get_by_fd(fd)
+	return _M.get_item(obj)
+end
+
+function _M.get_uid_item(uid, id)
+	local obj = objmgr.get(uid)
+	return _M.get_item(obj)
+end
+
+function _M.consume(obj, id, value)
 	if not self:check_consume(id, value) then
 		return false
 	end
 	local itemConfig = ds.query("item")[string.format("%d", id)]
 	return self:_decrease(itemConfig.type, id, value)
+end
+
+function _M.consume_uid(uid, id, value)
+	local obj = objmgr.get(uid)
+	return _M.consume_uid(obj, id, value)
+end
+
+function _M.reward(obj, id, num)
 end
 
 function _M.rcard_num(self)
@@ -138,22 +164,19 @@ function _M.rcard_num(self)
 	return item.num
 end
 
-function _M.package_info(self)
-	local uid = self.agentContext.uid
-	local index = self.context:get_entity_index(UserComponent)
-	local entity = index:get_entity(uid)
-	local package = entity.package.packages[PackageType.COMMON]
+function _M.fetch_items(fd, args)
+	local obj = objmgr.get_by_fd(fd)
+	local package = obj.mod_bag.bags[PackageType.COMMON]
 	assert(package)
 	local all = {}
 	for _, v in pairs(package) do
 		local item = {id = v.id, num = v.num}
 		table.insert(all, item)
 	end
-	local res = {
+	return {
 		errorcode = 0,
 		all = all
 	}
-	return res
 end
 
 return _M

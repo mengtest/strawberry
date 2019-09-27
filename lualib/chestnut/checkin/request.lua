@@ -9,8 +9,8 @@ local assert = assert
 local REQUEST = client.request()
 local traceback = debug.traceback
 
-function REQUEST.checkindaily(self, args)
-	return context.fetch(self, args)
+function REQUEST.fetch_checkins(fd, args)
+	return context.fetch_checkins(fd, args)
 end
 
 return REQUEST

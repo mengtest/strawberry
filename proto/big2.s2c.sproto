@@ -1,7 +1,7 @@
 ####################################### 
-# 大老二模块 [600, 700)
+# 大老二模块 [20000, 30000)
 # 轮到你做出选择，是出牌还是放弃
-big2take_turn 600 {
+big2take_turn 20000 {
     request {
         idx       0 : integer
         countdown 1 : integer
@@ -12,7 +12,7 @@ big2take_turn 600 {
 }
 
 # 
-big2call 601 {
+big2call 20001 {
     request {
         idx        0 : integer
         opcode     1 : integer
@@ -24,7 +24,7 @@ big2call 601 {
 }
 
 # 洗牌
-big2shuffle 602 {
+big2shuffle 20002 {
     request {
         first     0 : integer
         p1        1 : *integer
@@ -38,7 +38,7 @@ big2shuffle 602 {
 }
 
 # (deprecated)
-# big2lead 603 {
+# big2lead 20003 {
 #     request {
 #         idx       0 : integer
 #         leadtype   1 : integer
@@ -50,7 +50,7 @@ big2shuffle 602 {
 # }
 
 # 发牌
-big2deal 604 {
+big2deal 20004 {
     request {
         firstidx  0 : integer
         firsttake 1 : integer
@@ -61,7 +61,7 @@ big2deal 604 {
     }
 }
 
-big2ready 605 {
+big2ready 20005 {
     request {
         idx 0 : integer
     }
@@ -70,13 +70,13 @@ big2ready 605 {
     }
 }
 
-big2over 606 {
+big2over 20006 {
     response {
         errorcode 0 : integer
     }
 }
 
-big2restart 607 {
+big2restart 20007 {
     request {
         idx       0 : integer
     }
@@ -85,14 +85,14 @@ big2restart 607 {
     }
 }
 
-big2take_restart 608 {
+big2take_restart 20008 {
     response { 
         errorcode 0 : integer
     }
 }
 
 # 结算
-big2settle 609 {
+big2settle 20009 {
     request {
         settles 0 : *settle
     }
@@ -101,7 +101,7 @@ big2settle 609 {
     }
 }
 
-big2final_settle 610 {
+big2final_settle 20010 {
     request {
         p1 0 : *settlementitem
         p2 1 : *settlementitem
@@ -114,7 +114,7 @@ big2final_settle 610 {
     }
 }
 
-big2match 611 {
+big2match 20011 {
     request {
         roomid 0 : integer
     }
@@ -123,7 +123,7 @@ big2match 611 {
     }
 }
 
-big2rejoin 612 {
+big2rejoin 20012 {
     request {
         p 0 : big2player
     }
@@ -132,7 +132,7 @@ big2rejoin 612 {
     }
 }
 
-big2join 613 {
+big2join 20013 {
     request {
         p 0 : big2player
     }
@@ -141,7 +141,7 @@ big2join 613 {
     }
 }
 
-big2leave 614 {
+big2leave 20014 {
     request {
         idx       0 : integer
     }
@@ -150,7 +150,7 @@ big2leave 614 {
     }
 }
 
-big2take_ready 615 {
+big2take_ready 20015 {
     request {
         idx       0 : integer
     }

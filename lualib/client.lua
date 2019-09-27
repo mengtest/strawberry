@@ -7,7 +7,6 @@ local servicecode = require "enum.servicecode"
 local assert = assert
 local string_pack = string.pack
 local max = 2 ^ 16 - 1
-local handler = {}
 local host = sprotoloader.load(1):host "package"
 local send_request = host:attach(sprotoloader.load(2))
 local response_session = 0
@@ -18,7 +17,6 @@ local REQUEST = require "request"
 local RESPONSE = require "response"
 local login_type = "so"
 local gate
-local _middlewares = {}
 
 local function request(obj, name, args, response)
 	-- log.info("agent request [%s]", name)
@@ -40,7 +38,6 @@ local function request(obj, name, args, response)
 end
 
 local function response(session, args)
-	-- body
 	local name = ctx:get_name_by_session(session)
 	-- log.info("agent response [%s]", name)
 	local f = RESPONSE[name]
@@ -55,7 +52,6 @@ local function response(session, args)
 end
 
 local function send_package_id(id, pack)
-	-- body
 	assert(id and pack)
 	local package = string_pack(">s2", pack)
 	socket.send(id, package)
@@ -66,7 +62,6 @@ local function send_package_gate(fd, pack)
 end
 
 local function get_name_by_session(session)
-	-- body
 	return response_session_name[session]
 end
 
@@ -127,12 +122,7 @@ function _M.response()
 	return RESPONSE
 end
 
-function _M.use(middleware)
-	table.insert(_middlewares, middleware())
-end
-
 function _M.send_request(obj, name, args)
-	-- body
 	assert(obj.authed)
 	local fd = assert(obj.fd)
 	response_session = response_session + 1 % max
@@ -142,7 +132,6 @@ function _M.send_request(obj, name, args)
 end
 
 function _M.send_request_gate(obj, name, args)
-	-- body
 	assert(obj.authed)
 	response_session = response_session + 1 % max
 	response_session_name[response_session] = name
@@ -151,9 +140,7 @@ function _M.send_request_gate(obj, name, args)
 end
 
 function _M.push(obj, name, args)
-	-- body
-	assert(obj.authed)
-	assert(name)
+	assert(obj.authed and name)
 	local fd = assert(obj.fd)
 
 	if login_type == "so" then
@@ -163,7 +150,6 @@ function _M.push(obj, name, args)
 end
 
 function _M.push2objs(objs, name, args, ...)
-	-- body
 	for k, v in pairs(objs) do
 		_M.push(v, name, args, ...)
 	end

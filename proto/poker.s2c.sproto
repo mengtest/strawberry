@@ -1,8 +1,8 @@
 ####################################### 
-# 德州模块 [720, 800)
+# 德州模块 [40000, 50000)
 
 # 轮到你做出选择，是出牌还是放弃
-pokertake_turn 720 {
+pokertake_turn 40020 {
     request {
         idx       0 : integer
         countdown 1 : integer
@@ -12,7 +12,7 @@ pokertake_turn 720 {
     }
 }
 
-pokercall 721 {
+pokercall 40021 {
     request {
         idx        0 : integer
         opcode     1 : integer
@@ -33,7 +33,7 @@ pokercall 721 {
 # }
 
 # 发牌
-pokerdeal 723 {
+pokerdeal 40023 {
     request {
         sblindidx  0 : integer
         bblindidx  1 : integer
@@ -49,7 +49,7 @@ pokerdeal 723 {
 }
 
 # (deprecated)
-pokertake_ready 724 {
+pokertake_ready 40024 {
     request {
         idx       0 : integer
     }
@@ -59,7 +59,7 @@ pokertake_ready 724 {
 }
 
 # (deprecated)
-pokerready 725 {
+pokerready 40025 {
     request {
         idx 0 : integer
     }
@@ -68,20 +68,20 @@ pokerready 725 {
     }
 }
 
-pokerover 726 {
+pokerover 40026 {
     response {
         errorcode 0 : integer
     }
 }
 
 # 请求确认重新开始(deprecated)
-pokertake_restart 727 {
+pokertake_restart 40027 {
     response { 
         errorcode 0 : integer
     }
 }
 
-pokerrestart 728 {
+pokerrestart 40028 {
     request {
         idx       0 : integer
     }
@@ -91,7 +91,7 @@ pokerrestart 728 {
 }
 
 # 结算
-pokersettle 729 {
+pokersettle 40029 {
     request {
         settles 0 : *pokersettle
     }
@@ -100,7 +100,7 @@ pokersettle 729 {
     }
 }
 
-pokermatch 730 {
+pokermatch 40030 {
     request {
         roomid 0 : integer
     }
@@ -109,7 +109,7 @@ pokermatch 730 {
     }
 }
 
-pokerrejoin 731 {
+pokerrejoin 40031 {
     request {
         p 0 : pokerplayer
     }
@@ -118,7 +118,7 @@ pokerrejoin 731 {
     }
 }
 
-pokerjoin 732 {
+pokerjoin 40032 {
     request {
         p 0 : pokerplayer
     }
@@ -127,7 +127,7 @@ pokerjoin 732 {
     }
 }
 
-pokerleave 733 {
+pokerleave 40033 {
     request {
         idx       0 : integer
     }
@@ -136,7 +136,7 @@ pokerleave 733 {
     }
 }
 
-pokersitdown 734 {
+pokersitdown 40034 {
     request {
         idx       0 : integer
     }
@@ -145,7 +145,7 @@ pokersitdown 734 {
     }   
 }
 
-pokerstandup 735 {
+pokerstandup 40035 {
     request {
         idx       0 : integer
     }

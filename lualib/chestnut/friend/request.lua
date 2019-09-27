@@ -10,9 +10,9 @@ local assert = assert
 local REQUEST = client.request()
 local traceback = debug.traceback
 
-function REQUEST.fetch_friends(self, args)
+function REQUEST.fetch_friends(fd, args)
 	local obj = self.obj
-	return context.fetch_friends(self, args)
+	return context.fetch_friends(fd, args)
 end
 
 function REQUEST.fetch_friend(self, args)

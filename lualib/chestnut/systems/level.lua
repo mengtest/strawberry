@@ -1,6 +1,6 @@
 local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
-local ds = require "skynet.sharetable"
+local sd = require "skynet.sharetable"
 local _M = {}
 local level_config
 
@@ -9,17 +9,17 @@ end
 
 skynet.init(
 	function()
-		level_config = ds.query("levelConfig")
+		level_config = sd.query("levelConfig")
 	end
 )
 
-function _M:on_enter()
+function _M.on_enter(self)
 end
 
-function _M:on_exit()
+function _M.on_exit(self)
 end
 
-function _M:add_exp(exp)
+function _M.add_exp(self, exp)
 	-- body
 	assert(self)
 	assert(exp > 0)

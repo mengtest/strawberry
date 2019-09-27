@@ -11,6 +11,7 @@ local client = require "client"
 local dbc = require "db.db"
 local stp = require "StackTracePlus"
 local traceback = stp.stacktrace
+local table_dump = require "luaTableDump"
 local _M = {}
 local assert = assert
 local _reload = false
@@ -183,6 +184,18 @@ function _M.modify_name(fd, args)
 	local res = {}
 	res.errorcode = 1
 	return res
+end
+
+function _M.rank_power(fd, args)
+end
+
+function _M.fetch_store_items(fd, args)
+end
+
+function _M.fetch_store_item(fd, args)
+end
+
+function _M.buy_store_item(fd, args)
 end
 
 return _M

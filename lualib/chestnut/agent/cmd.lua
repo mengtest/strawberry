@@ -55,7 +55,7 @@ function CMD.auth(args)
     return context.auth(args)
 end
 
-function _M.afk(fd)
+function CMD.afk(fd)
     return context.afk(fd)
 end
 

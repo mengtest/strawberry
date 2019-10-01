@@ -267,7 +267,7 @@ CREATE TABLE `tb_user_package` (
 DROP TABLE IF EXISTS `tb_user_record`;
 CREATE TABLE `tb_user_record` (
   `uid` bigint(20) NOT NULL,
-  `id` bigint(11) NOT NULL,
+  `id` bigint(20) NOT NULL,
   `recordid` int(11) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

@@ -1,48 +1,11 @@
 local skynet = require "skynet"
-local sd = require "skynet.sharetable"
-local log = require "chestnut.skynet.log"
-local zset = require "zset"
-local json = require "rapidjson"
 local savedata = require "savedata"
-local service = require "service"
+local context = require "chestnut.mail_mgr.context"
 local CMD = require "cmd"
-local traceback = debug.traceback
-local assert = assert
-local users = {}
-local rooms = {}
-local zs = zset.new()
-
 local subscribe = {}
 
-local function save_data()
-    if zs:count() > 0 then
-        local db_mails = {}
-        local t = zs:range(1, zs:count())
-        for k, v in pairs(t) do
-            local db_mail = {}
-            db_mail.id = assert(v.id)
-            db_mail.sender = assert(v.sender)
-            db_mail.to = assert(v.to)
-            db_mail.create_time = assert(v.create_time)
-            db_mail.title = assert(v.title)
-            db_mail.content = assert(v.content)
-            db_mail.appendix = assert(v.appendix)
-            db_mails[string.format("%d", k)] = db_mail
-        end
-        local data = {}
-        data.mails = db_mails
-        local pack = json.encode(data)
-        redis:set("tb_sysmail", pack)
-    end
-end
-
-skynet.init(
-    function()
-    end
-)
-
 function subscribe.save_data()
-    save_data()
+    -- context.save_data()
 end
 
 function CMD.start()
@@ -54,24 +17,7 @@ function CMD.start()
 end
 
 function CMD.init_data()
-    -- body
-    -- local pack = redis:get("tb_sysmail")
-    -- if pack then
-    -- 	local data = json.decode(pack)
-    -- 	for k,v in pairs(data.mails) do
-    -- 		local db_mail = {}
-    -- 		db_mail.id          = assert(v.id)
-    -- 		db_mail.sender      = assert(v.sender)
-    -- 		db_mail.to          = assert(v.to)
-    -- 		db_mail.create_time = assert(v.create_time)
-    -- 		db_mail.title       = assert(v.title)
-    -- 		db_mail.content     = assert(v.content)
-    -- 		db_mail.appendix    = assert(v.appendix)
-    -- 		zs:add(tonumber(k), db_mail)
-    -- 	end
-    -- end
-    log.info("mail_mgr init_data over.")
-    return true
+    return context.init_data()
 end
 
 function CMD.sayhi()
@@ -80,7 +26,7 @@ function CMD.sayhi()
 end
 
 function CMD.close()
-    save_data()
+    -- context.save_data()
     return true
 end
 
@@ -96,7 +42,6 @@ end
 
 -- 用户初始
 function CMD:poll(uid, agent, max_id, ...)
-    -- body
     assert(users[uid] == nil)
     local u = {uid = uid, agent = agent}
     users[uid] = u
@@ -122,7 +67,6 @@ function CMD:afk(uid, ...)
 end
 
 function CMD.new_mail(title, content, appendix, to, ...)
-    -- body
 end
 
 return CMD

@@ -1,5 +1,4 @@
 local skynet = require "skynet"
-local mc = require "skynet.multicast"
 local log = require "chestnut.skynet.log"
 local service = require "service"
 local table_insert = table.insert
@@ -77,12 +76,10 @@ function CMD.register(handle)
 end
 
 function CMD.uniq(name)
-	-- body
 	return launch_uniq(name)
 end
 
 function CMD.kill()
-	-- body
 	for _, v in pairs(services) do
 		skynet.call(v, "lua", "close")
 	end

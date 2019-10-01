@@ -1,7 +1,6 @@
 local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
 local context = require "chestnut.bag.context"
-local servicecode = require "enum.servicecode"
 local client = require "client"
 local pcall = pcall
 local assert = assert

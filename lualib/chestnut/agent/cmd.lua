@@ -1,9 +1,17 @@
 local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
-local servicecode = require "enum.servicecode"
 local context = require "chestnut.agent.context"
 local savedata = require "savedata"
 local CMD = require "cmd"
+require "chestnut.achievement.cmd"
+require "chestnut.bag.cmd"
+require "chestnut.chat.cmd"
+require "chestnut.checkin.cmd"
+require "chestnut.friend.cmd"
+require "chestnut.hero.cmd"
+require "chestnut.mail.cmd"
+require "chestnut.record.cmd"
+require "chestnut.team.cmd"
 local SUB = {}
 local traceback = debug.traceback
 

@@ -302,6 +302,7 @@ join_team 753 {
 fetch_store_items 800 {
     response {
         errorcode 0 : integer
+        items 1 : *store_item
     }
 }
 
@@ -311,6 +312,7 @@ fetch_store_item 801 {
     }
     response {
         errorcode 0 : integer
+        item 1 : store_item
     }
 }
 

@@ -5,11 +5,9 @@ local queue = require "chestnut.queue"
 
 local cls = class("waiting_queue")
 
-function cls:ctor( ... )
-	-- body
-
+function cls:ctor(...)
 	self._id = 0
-	self._rooms = queue()  -- freelist
+	self._rooms = queue() -- freelist
 
 	self._queues = {}
 
@@ -19,16 +17,14 @@ function cls:ctor( ... )
 	self._cs2 = skynet_queue()
 
 	-- pre gen rooms
-	for i=1,10 do
+	for i = 1, 10 do
 		local room = self:_create_room()
 		self:enqueue_room(room)
 	end
 end
 
-function cls:enqueue_agent(t, agent, ... )
-	-- body
-	local function func(q, i, ... )
-		-- body
+function cls:enqueue_agent(t, agent, ...)
+	local function func(q, i, ...)
 		q:enqueue(i)
 	end
 	local q = self._queues[t]
@@ -39,10 +35,8 @@ function cls:enqueue_agent(t, agent, ... )
 	return self._cs1(func, q, agent)
 end
 
-function cls:dequeue_agent(t, ... )
-	-- body
-	local function func(q, ... )
-		-- body
+function cls:dequeue_agent(t, ...)
+	local function func(q, ...)
 		if #q > 0 then
 			return q:dequeue()
 		end
@@ -55,10 +49,8 @@ function cls:dequeue_agent(t, ... )
 	return nil
 end
 
-function cls:remove_agent(t, agent, ... )
-	-- body
-	local function func(q, i, ... )
-		-- body
+function cls:remove_agent(t, agent, ...)
+	local function func(q, i, ...)
 		q:remove(i)
 	end
 	local q = self._queues[t]
@@ -67,8 +59,7 @@ function cls:remove_agent(t, agent, ... )
 	end
 end
 
-function cls:get_agent_queue_sz(t, ... )
-	-- body
+function cls:get_agent_queue_sz(t, ...)
 	local q = self._queues[t]
 	if q then
 		return #q
@@ -77,35 +68,35 @@ function cls:get_agent_queue_sz(t, ... )
 	end
 end
 
-function cls:_create_room( ... )
+function cls:_create_room(...)
 	-- body
 	self._id = self._id + 1
 	local addr = skynet.newservice("room/room", self._id)
 
 	local x = {
 		id = self._id,
-		addr = addr,
+		addr = addr
 	}
 	return x
 end
 
 -- manager room
-function cls:enqueue_room(room, ... )
+function cls:enqueue_room(room, ...)
 	-- body
 	assert(room and room.id)
 	if self._urooms[room.id] then
 		self._urooms[room.id] = nil
 	end
-	local function func1(q, r, ... )
+	local function func1(q, r, ...)
 		-- body
 		q:enqueue(r)
 	end
 	return self._cs2(func1, self._rooms, room)
 end
 
-function cls:dequeue_room( ... )
+function cls:dequeue_room(...)
 	-- body
-	local function func1(q, ... )
+	local function func1(q, ...)
 		-- body
 		if #q > 0 then
 			return q:dequeue()
@@ -121,7 +112,7 @@ function cls:dequeue_room( ... )
 	return room
 end
 
-function cls:get(id, ... )
+function cls:get(id, ...)
 	-- body
 	assert(id)
 	return self._urooms[id]

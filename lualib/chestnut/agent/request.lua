@@ -5,6 +5,15 @@ local client = require "client"
 local pcall = pcall
 local assert = assert
 local REQUEST = client.request()
+require "chestnut.achievement.request"
+require "chestnut.bag.requset"
+require "chestnut.chat.request"
+require "chestnut.checkin.request"
+require "chestnut.friend.request"
+require "chestnut.hero.request"
+require "chestnut.mail.request"
+require "chestnut.record.request"
+require "chestnut.team.request"
 local traceback = debug.traceback
 
 function REQUEST.handshake(fd)

@@ -1,18 +1,17 @@
 local skynet = require "skynet"
-local ds = require "skynet.sharetable"
+local sd = require "skynet.sharetable"
 local log = require "chestnut.skynet.log"
-local request = require "chestnut.hero.request"
-local response = require "chestnut.hero.response"
 local objmgr = require "objmgr"
 local client = require "client"
 local table_dump = require "luaTableDump"
+local servicecode = require "enum.servicecode"
 local assert = assert
 local _M = {}
-local hero_cfg
+local info_cfg
 
 skynet.init(
 	function()
-		hero_cfg = ds.query("heroConfig")
+		info_cfg = sd.query("InfoConfig")
 	end
 )
 

@@ -4,6 +4,7 @@ local snowflake = require "chestnut.snowflake"
 local log = require "chestnut.skynet.log"
 local sysmaild = require "sysmaild"
 local client = require "client"
+local servicecode = require "enum.servicecode"
 local _M = {}
 
 local function send_inbox_list(obj, ...)

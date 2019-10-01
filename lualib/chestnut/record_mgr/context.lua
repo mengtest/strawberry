@@ -1,10 +1,10 @@
 local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
-local servicecode = require "enum.servicecode"
 local client = require "client"
 local _M = {}
 
 local function send_records(obj)
+	-- body
 	local l = {}
 	for _, v in pairs(self._mk) do
 		if v.viewed.value == 0 then
@@ -24,38 +24,28 @@ local function send_records(obj)
 end
 
 function _M.on_data_init(self, dbData)
-	self.mod_record = {records = {}}
-	local db_records = dbData.db_records
-	for _, db_item in pairs(db_records) do
-		local item = {}
-		item.id = assert(db_item.id)
-		item.recordid = assert(db_item.recordid)
-		self.mod_record.records[tonumber(item.id)] = item
-	end
 end
 
 function _M.on_data_save(self, dbData)
-	dbData.db_records = {}
-	for _, item in pairs(self.mod_record.records) do
-		local db_item = {}
-		db_item.uid = self.uid
-		db_item.id = item.id
-		db_item.recordid = item.recordid
-		table.insert(dbData.db_records, db_item)
-	end
 end
 
 function _M.on_enter(self)
 	send_records(self)
 end
 
-function _M.add(self, item, ...)
+function _M:send_record(...)
+	-- body
+end
+
+function _M:add(item, ...)
+	-- body
 	table.insert(self._data, mail)
 	self._count = self._count + 1
 	self._mk[item.id.value] = item
 end
 
-function _M.create(self, recordid, names, ...)
+function _M:create(recordid, names, ...)
+	-- body
 	local r = record.new(self._env, self._dbctx, self)
 	r.id.value = recordid
 	r.uid = self._env._suid
@@ -67,14 +57,15 @@ function _M.create(self, recordid, names, ...)
 	return r
 end
 
-function _M.add(self, mail, ...)
+function _M:add(mail, ...)
+	-- body
 	table.insert(self._data, mail)
 	self._count = self._count + 1
 	self._mk[mail.mailid.value] = mail
 end
 
-function _M.fetch_records(fd, args)
-	local obj = objmgr.get_by_fd(fd)
+function _M:records(args, ...)
+	-- body
 	local res = {}
 	res.errorcode = errorcode.SUCCESS
 	res.records = {}
@@ -91,7 +82,8 @@ function _M.fetch_records(fd, args)
 	return res
 end
 
-function _M.record(self, recordid, names, ...)
+function _M:record(recordid, names, ...)
+	-- body
 	local i = record.new(self._env, self._dbctx, self)
 	i.uid.value = self._env._suid
 	i.recordid = recordid

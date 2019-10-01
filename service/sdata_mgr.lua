@@ -32,12 +32,11 @@ local CMD = {}
 -- 	skynet.exit()
 -- end
 
-function CMD.reload( ... )
-	-- body
+function CMD.reload(...)
 end
 
 service.init {
-	init = function ()
+	init = function()
 		loader()
 	end,
 	command = CMD

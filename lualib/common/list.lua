@@ -1,16 +1,15 @@
 local assert = assert
 local _M = {}
 
-function _M.push_front(L, node, ... )
-	-- body
+function _M.push_front(L, node, ...)
 	assert(type(ele) == "table")
 	node.__prev__ = nil
 	node.__next__ = nil
-	
+
 	if L.size == 0 then
 		L.head = node
 		L.tail = node
-	else 
+	else
 		node.__next__ = L.head
 		L.head.__prev__ = node
 		L.head = node
@@ -18,9 +17,7 @@ function _M.push_front(L, node, ... )
 	L.size = L.size + 1
 end
 
-function _M.push_back(L, node, ... )
-	-- body
-	
+function _M.push_back(L, node, ...)
 	node.__prev__ = nil
 	node.__next__ = nil
 
@@ -35,8 +32,7 @@ function _M.push_back(L, node, ... )
 	L.size = L.size + 1
 end
 
-function _M.remove(L, node, ... )
-	-- body
+function _M.remove(L, node, ...)
 	assert(L and node)
 	if L.size == 0 then
 	elseif L.size == 1 then
@@ -59,8 +55,7 @@ function _M.remove(L, node, ... )
 	end
 end
 
-function _M.pop_front(L, ... )
-	-- body
+function _M.pop_front(L, ...)
 	assert(L)
 	if L.size == 0 then
 	elseif L.size == 1 then
@@ -78,8 +73,7 @@ function _M.pop_front(L, ... )
 	return
 end
 
-function _M.pop_back(L, ... )
-	-- body
+function _M.pop_back(L, ...)
 	assert(L)
 	if L.size == 0 then
 		return false
@@ -99,28 +93,25 @@ function _M.pop_back(L, ... )
 	return
 end
 
-function _M.foreach(L, func, ... )
-	-- body
+function _M.foreach(L, func, ...)
 	assert(L and func)
 	local node = L.head
-	while node ~= nil do		
+	while node ~= nil do
 		func(node)
 		node = node.__next__
 	end
 end
 
-function _M.sort(L, comp, ... )
-	-- body
-	assert(L and comp)	
+function _M.sort(L, comp, ...)
+	assert(L and comp)
 end
 
-local function list( ... )
-	-- body
+local function list(...)
 	local node = {}
 	node.size = 0
 	node.head = nil
 	node.tail = nil
-	setmetatable(node, { __index = _M })
+	setmetatable(node, {__index = _M})
 	return node
 end
 

@@ -190,12 +190,18 @@ function _M.rank_power(fd, args)
 end
 
 function _M.fetch_store_items(fd, args)
+	local obj = objmgr.get_by_fd(fd)
+	return skynet.call(".STORE", "lua", "fetch_store_items", obj.uid, args)
 end
 
 function _M.fetch_store_item(fd, args)
+	local obj = objmgr.get_by_fd(fd)
+	return skynet.call(".STORE", "lua", "fetch_store_item", obj.uid, args)
 end
 
 function _M.buy_store_item(fd, args)
+	local obj = objmgr.get_by_fd(fd)
+	return skynet.call(".STORE", "lua", "buy_store_item", obj.uid, args)
 end
 
 return _M

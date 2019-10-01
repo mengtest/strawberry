@@ -81,7 +81,7 @@ IF lastVersion < 6 THEN
 		`create_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   		`update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		PRIMARY KEY (`uid`, `friend_uid`)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='英雄角色';
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='好友';
 
 	SET lastVersion = 6;
 	SET versionNotes = 'add tb_user_friends';
@@ -96,8 +96,8 @@ IF lastVersion < 7 THEN
 		`accept` int(11) NOT NULL,
 		`create_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   		`update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-		PRIMARY KEY (`uid`)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='英雄角色';
+		PRIMARY KEY (`id`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='好友请求';
 
 	SET lastVersion = 7;
 	SET versionNotes = 'add tb_user_friend_reqs';
@@ -105,7 +105,7 @@ END IF;
 
 IF lastVersion < 8 THEN
 	DROP TABLE IF EXISTS `tb_teams`;
-	CREATE TABLE `tb_user_friend_reqs` (
+	CREATE TABLE `tb_teams` (
 		`id`  bigint(20) NOT NULL,
 		`name` varchar(32) NOT NULL,
 		`simple` varchar(255) NOT NULL,
@@ -116,7 +116,7 @@ IF lastVersion < 8 THEN
 		`create_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   		`update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		PRIMARY KEY (`id`)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='英雄角色';
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='战队';
 
 	SET lastVersion = 8;
 	SET versionNotes = 'add tb_teams';
@@ -127,6 +127,21 @@ IF lastVersion < 9 THEN
 	
 	SET lastVersion = 9;
 	SET versionNotes = 'alter tb_user_friends';
+END IF;
+
+IF lastVersion < 10 THEN
+	DROP TABLE IF EXISTS `tb_user_store`;
+	CREATE TABLE `tb_user_store` (
+		`id`  int(11) NOT NULL,
+		`uid`  bigint(20) NOT NULL,
+		`times` int(11) NOT NULL,
+		`create_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  		`update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		PRIMARY KEY (`id`, `uid`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='商店';
+
+	SET lastVersion = 10;
+	SET versionNotes = 'add tb_user_store';
 END IF;
 
 IF lastVersion > lastVersion1 THEN
@@ -292,6 +307,7 @@ BEGIN
 	VALUES (in_id, in_uid, in_power)
 	ON DUPLICATE KEY UPDATE uid=in_id, power=in_power;
 END;;
+DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for sp_user_friends_select
@@ -305,14 +321,14 @@ END;;
 DELIMITER ;
 
 -- ----------------------------
--- Procedure structure for sp_zset_power_insert_or_update
+-- Procedure structure for sp_user_firends_insert_or_update
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `sp_user_firends_insert_or_update`;
 DELIMITER ;;
 CREATE PROCEDURE `sp_user_firends_insert_or_update`(IN `in_uid` bigint,
 	IN `in_friend_uid` bigint,
-	IN `in_alias` varchar(255)
-	IN `in_deled` int(11))
+	IN `in_alias` varchar(255),
+	IN `in_deled` int)
 BEGIN
 	INSERT INTO tb_user_friends(uid, friend_uid, alias, deled)
 	VALUES (in_uid, in_friend_uid, in_alias, in_deled)
@@ -327,7 +343,7 @@ DROP PROCEDURE IF EXISTS `sp_user_friend_reqs_select`;
 DELIMITER ;;
 CREATE PROCEDURE `sp_user_friend_reqs_select`(IN `in_uid` bigint)
 BEGIN
-	SELECT * FROM tb_user_friend_reqs WHERE to_uid=in_uid ADD accept=0;
+	SELECT * FROM tb_user_friend_reqs WHERE to_uid=in_uid AND accept=0;
 END;;
 DELIMITER ;
 
@@ -371,11 +387,39 @@ CREATE PROCEDURE `sp_teams_insert_or_update`(IN `in_id` bigint(20),
 	IN `in_join_cond` varchar(255),
 	IN `in_members` blob,
 BEGIN
-	INSERT INTO tb_teams(id, name, simple, power, join_tp, join_cond, members)
+	INSERT INTO tb_teams(id, `name`, `simple`, `power`, join_tp, join_cond, members)
 	VALUES (in_id, in_name, in_simple, in_power, in_join_tp, in_join_cond, in_members)
-	ON DUPLICATE KEY UPDATE id=in_id, name=in_name, simple=in_simple, power=in_power, join_tp=in_join_tp, join_cond=in_join_cond, members=in_members;
+	ON DUPLICATE KEY UPDATE id=in_id, `name`=in_name, `simple`=in_simple, `power`=in_power, join_tp=in_join_tp, join_cond=in_join_cond, members=in_members;
 END;;
 DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for sp_teams_select
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `sp_user_store_select`;
+DELIMITER ;;
+CREATE PROCEDURE `sp_teams_select`()
+BEGIN
+	SELECT * FROM tb_user_store;
+END;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for sp_user_store_insert_or_update
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `sp_user_store_insert_or_update`;
+DELIMITER ;;
+CREATE PROCEDURE `sp_user_store_insert_or_update`(IN `in_id` int(11),
+	IN `in_uid` bigint(20),
+	IN `in_times` int(11),
+BEGIN
+	INSERT INTO tb_user_store(id, uid, times)
+	VALUES (in_id, in_uid, in_times)
+	ON DUPLICATE KEY UPDATE id=in_id, uid=in_uid, times=in_times;
+END;;
+DELIMITER ;
+
+
 
 # 过程修改结束
 ###############################################################

@@ -1,3 +1,4 @@
+-- 热更新静态数据
 local skynet = require "skynet"
 local addr
 local _M = {}

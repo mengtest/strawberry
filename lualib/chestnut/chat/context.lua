@@ -4,6 +4,7 @@ local savedata = require "savedata"
 local snowflake = require "chestnut.snowflake"
 local client = require "client"
 local log = require "chestnut.skynet.log"
+local servicecode = require "enum.servicecode"
 local _M = {}
 
 skynet.init(

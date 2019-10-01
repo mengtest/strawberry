@@ -1,6 +1,7 @@
 local skynet = require "skynet"
 local savedata = require "savedata"
-local command = require "command"
+local context = require "chestnut.store.context"
+local dbc = require "db"
 local CMD = require "cmd"
 
 function CMD.start()
@@ -10,6 +11,7 @@ function CMD.start()
 end
 
 function CMD.init_data()
+    -- context.on_data_init(db_data)
     return true
 end
 
@@ -29,6 +31,15 @@ function CMD.kill()
 end
 
 function CMD.fetch_store_items(uid, args)
+    return context.fetch_store_items(uid, args)
+end
+
+function CMD.fetch_store_item(uid, args)
+    return context.fetch_store_item(uid, args)
+end
+
+function CMD.buy_store_item(uid, args)
+    return context.buy_store_item(uid, args)
 end
 
 return CMD

@@ -1,11 +1,9 @@
 local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
 local context = require "chestnut.chat.context"
-local servicecode = require "enum.servicecode"
-local client = require "client"
+local REQUEST = require "request"
 local pcall = pcall
 local assert = assert
-local REQUEST = client.request()
 local traceback = debug.traceback
 
 function REQUEST.say(self, args)

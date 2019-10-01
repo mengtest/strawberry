@@ -1,10 +1,13 @@
 local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
-local context = require "chestnut.team.context"
+local time_utils = require "common.utils"
+local logout = require "chestnut.agent.logout"
+local context = require "chestnut.taskdaily.context"
 local servicecode = require "enum.servicecode"
-local REQUEST = require "request"
+local client = require "client"
 local pcall = pcall
 local assert = assert
+local REQUEST = client.request()
 local traceback = debug.traceback
 
 function REQUEST.fetch_taskdailys(self, args)

@@ -1,8 +1,5 @@
 local skynet = require "skynet"
--- local cluster = require "cluster"
-local csvreader = require "common.csvReader"
--- local query = require "query"
-local errorcode = require "enum.errcode"
+local errorcode = require "enum.servicecode"
 local json = require "rapidjson"
 local pcall = skynet.pcall
 local template = {}

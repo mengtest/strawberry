@@ -15,7 +15,7 @@ skynet.start(
 
 		skynet.uniqueservice("protoloader")
 		-- config
-		skynet.uniqueservice("chestnut/sdata_mgr")
+		skynet.uniqueservice("sdata_mgr")
 
 		local dbinitd = skynet.newservice("dbinitd")
 		local ok = skynet.call(dbinitd, "lua", "initdb")

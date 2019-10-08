@@ -10,7 +10,6 @@ local REQUEST = client.request()
 local traceback = debug.traceback
 
 function REQUEST:room_info(args)
-	-- body
 	local ok, err = pcall(self.systems.room.room_info, self.systems.room, args)
 	if ok then
 		return err
@@ -35,30 +34,25 @@ function REQUEST:create(args)
 end
 
 function REQUEST:join(args)
-	-- body
 	local M = self.systems.room
 	return M:join(args)
 end
 
 function REQUEST:rejoin()
-	-- body
 	return self.systems.room:rejoin()
 end
 
 function REQUEST:leave(args)
-	-- body
 	local M = self.systems.room
 	return M:leave(args)
 end
 
 function REQUEST:ready(args, ...)
-	-- body
 	local M = self.systems.room
 	return M:forward_room("ready", args, ...)
 end
 
 function REQUEST:call(args, ...)
-	-- body
 	local M = self.systems.room
 	return M:forward_room("call", args, ...)
 end
@@ -72,37 +66,31 @@ end
 
 -- 此协议已经无效
 function REQUEST:dice(args, ...)
-	-- body
 	local M = self.systems.room
 	return M:forward_room("dice", args, ...)
 end
 
 function REQUEST:lead(args, ...)
-	-- body
 	local M = self.systems.room
 	return M:forward_room("lead", args, ...)
 end
 
 function REQUEST:step(args, ...)
-	-- body
 	local M = self.systems.room
 	return M:forward_room("step", args, ...)
 end
 
 function REQUEST:restart(args, ...)
-	-- body
 	local M = self.systems.room
 	return M:forward_room("restart", args, ...)
 end
 
 function REQUEST:xuanpao(args, ...)
-	-- body
 	local M = self.systems.room
 	return M:forward_room("xuanpao", args, ...)
 end
 
 function REQUEST:xuanque(args, ...)
-	-- body
 	local M = self.systems.room
 	return M:forward_room("xuanque", args, ...)
 end

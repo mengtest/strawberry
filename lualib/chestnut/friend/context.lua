@@ -3,7 +3,6 @@ local sd = require "skynet.sharedata"
 local snowflake = require "chestnut.snowflake"
 local log = require "chestnut.skynet.log"
 local agent_mgr = require "chestnut.agent_mgr.c"
-local sysmaild = require "sysmaild"
 local client = require "client"
 local objmgr = require "objmgr"
 local _M = {}

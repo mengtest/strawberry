@@ -1,16 +1,17 @@
 local skynet = require "skynet"
+local dbc = require "db"
 local _M = {}
 
-function _M.on_data_init(self, dbData)
+function _M.init_data()
 end
 
-function _M.on_data_save(self, dbData)
+function _M.save_data()
 end
 
-function _M.on_enter(self)
+function _M.on_enter()
 end
 
-function _M.fetch(self, args)
+function _M.fetch_teams(uid, args)
 end
 
 return _M

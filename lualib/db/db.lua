@@ -15,26 +15,21 @@ local function get_address()
 end
 
 function QUERY.start(...)
-	-- body
 	local db = util.connect_mysql()
 	ctx = {db = db, dump = util.dump}
 end
 
 function QUERY.close()
-	-- body
 	util.disconnect_mysql(db)
 end
 
 function QUERY.kill()
-	-- body
 	skynet.exit()
 end
 
 ------------------------------------------
 -- read data
-
 function QUERY.read_account_by_username(username, password)
-	-- body
 	local res = {}
 	local accounts = db_read.read_account_by_username(ctx, username, password)
 	if #accounts == 1 then
@@ -82,7 +77,7 @@ end
 
 function QUERY.read_zset(tname)
 	local res = {}
-	res.db_zset = db_read.read_zset(ctx, tname)
+	res[tname] = db_read.read_zset(ctx, tname)
 	return res
 end
 
@@ -112,13 +107,11 @@ function QUERY.write_sysmail()
 end
 
 function QUERY.write_room_mgr(data)
-	-- body
 	db_write.write_room_mgr_users(ctx, data.db_users)
 	db_write.write_room_mgr_rooms(ctx, data.db_rooms)
 end
 
 function QUERY.write_room(data)
-	-- body
 	db_write.write_room_users(ctx, data.db_users)
 	db_write.write_room(ctx, data.db_room)
 end
@@ -130,7 +123,6 @@ end
 ------------------------------------------
 -- 修改离线数据
 function QUERY.write_offuser_room(db_user_room)
-	-- body
 	db_write.write_offuser_room_created(ctx, db_user_room)
 end
 
@@ -141,7 +133,6 @@ local _M = {}
 _M.host = QUERY
 
 function _M.read_sysmail(...)
-	-- body
 	local handle = get_address()
 	return skynet.call(handle, "lua", "read_sysmail")
 end

@@ -5,7 +5,6 @@ local string_format = string.format
 local _M = {}
 
 function _M:read_sysmail()
-	-- body
 	local res = self.db:query("SELECT * FROM tb_sysmail;")
 	if res.error then
 		log.error("%s", self.dump(res))
@@ -18,7 +17,6 @@ function _M:read_sysmail()
 end
 
 function _M:read_account_by_username(username, password)
-	-- body
 	local res = self.db:query(string.format("CALL sp_account_select('%s', '%s');", username, password))
 	if res.errno then
 		log.error("%s", self.dump(res))
@@ -31,7 +29,6 @@ function _M:read_account_by_username(username, password)
 end
 
 function _M:read_room_mgr_users()
-	-- body
 	local res = self.db:query("CALL sp_room_mgr_users_select();")
 	if res.errno then
 		log.error("%s", self.dump(res))
@@ -44,7 +41,6 @@ function _M:read_room_mgr_users()
 end
 
 function _M:read_room_mgr_rooms()
-	-- body
 	local res = self.db:query("CALL sp_room_mgr_rooms_select();")
 	if res.errno then
 		log.error("%s", self.dump(res))
@@ -57,7 +53,6 @@ function _M:read_room_mgr_rooms()
 end
 
 function _M:read_room(id)
-	-- body
 	local res = self.db:query(string_format("CALL sp_room_select(%d);", id))
 	if res.errno then
 		log.error("%s", self.dump(res))

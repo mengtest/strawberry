@@ -2,30 +2,28 @@ local skynet = require "skynet"
 local sd = require "skynet.sharedata"
 local snowflake = require "chestnut.snowflake"
 local log = require "chestnut.skynet.log"
-local sysmaild = require "sysmaild"
 local client = require "client"
 local servicecode = require "enum.servicecode"
 local _M = {}
 
-local function send_inbox_list(obj, ...)
-	-- body
-	local l = {}
-	for _, v in pairs(self._mk) do
-		if v.viewed.value == 0 then
-			local mail = {}
-			mail.id = v.mailid
-			mail.viewed = v.viewed
-			mail.title = t.title
-			mail.content = t.content
-			mail.datetime = t.datetime
-			table.insert(l, mail)
-		end
-	end
+-- local function send_inbox_list(obj, ...)
+-- 	local l = {}
+-- 	for _, v in pairs(self._mk) do
+-- 		if v.viewed.value == 0 then
+-- 			local mail = {}
+-- 			mail.id = v.mailid
+-- 			mail.viewed = v.viewed
+-- 			mail.title = t.title
+-- 			mail.content = t.content
+-- 			mail.datetime = t.datetime
+-- 			table.insert(l, mail)
+-- 		end
+-- 	end
 
-	local args = {}
-	args.l = l
-	client.push(obj, "inbox", args)
-end
+-- 	local args = {}
+-- 	args.l = l
+-- 	client.push(obj, "inbox", args)
+-- end
 
 skynet.init(
 	function()
@@ -77,7 +75,6 @@ function _M.poll(...)
 end
 
 function _M.send_inbox(id, ...)
-	-- body
 	local v = assert(self._mk[id])
 	local l = {}
 	local mail = {}

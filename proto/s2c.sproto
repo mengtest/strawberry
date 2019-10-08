@@ -51,10 +51,39 @@
     level 1 : integer
 }
 
+.rank_power_item {
+    id 0 : integer
+    uid 1 : integer
+    power 2 : integer
+}
+
+.taskdaily {
+    id 0 : integer
+    finished 1 : integer
+}
+
+.base_info {
+    num      0 : integer
+    nickname 1 : string
+    nameid 2 : string
+    rcard 3 : integer
+    level 4 : integer
+}
+
+.team {
+    id 0 : integer
+    name 1 : string
+}
+
+.store_item {
+    id 0 : integer
+}
+
 .op {
 	session 0 : integer
     opcode 1 : integer
 }
+
 ####################################### 
 # 一般模块 [1, 100)
 handshake 1 {
@@ -96,11 +125,7 @@ offline 4 {
 # 系统模块 [100, 500)
 base_info 101 {
     request {
-        num      0 : integer
-        nickname 1 : string
-        nameid 2 : string
-        rcard 3 : integer
-        level 4 : integer
+        info 0 : base_info
     }
     response {
         errorcode 0 : integer
@@ -130,7 +155,7 @@ new_name 103 {
 # 背包模块 [150, 200)
 package_info 150 {
     request {
-        all       0 : *item
+        common 0 : *item
     }
     response {
         errorcode 0 : integer
@@ -208,10 +233,12 @@ inbox 300 {
 }
 
 ####################################### 
-# 签到模块 [350, 400)
+# 每日签到模块 [350, 400)
 checkins 350 {
     request {
-        
+    }
+    response {
+        errorcode 0 : integer
     }
 }
 
@@ -255,8 +282,33 @@ player_heros 550 {
     }
 }
 
+add_hero 551 {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
 ####################################### 
-# 球球模块 [10000, 10100)
+# 好友模块 [600, 650)
+player_friends 600 {
+    request {
+    }
+}
+
+####################################### 
+# 排行榜模块 [650, 700)
+
+####################################### 
+# 战队模块 [750, 800)
+
+####################################### 
+# 商店模块 [800, 850)
+
+####################################### 
+# 球球模块 [10000, 20000)
 opcode 10000 {
     request {
         ops 0 : *op

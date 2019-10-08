@@ -2,9 +2,6 @@ local skynet = require "skynet"
 local log = require "chestnut.skynet.log"
 local AgentSystems = require "chestnut.agent.systems"
 local servicecode = require "enum.servicecode"
-local CMD = require "chestnut.agent.cmd"
-local request = require "chestnut.agent.request"
-local response = require "chestnut.agent.response"
 local logout = require "chestnut.agent.logout"
 local objmgr = require "objmgr"
 local client = require "client"
@@ -15,6 +12,11 @@ local table_dump = require "luaTableDump"
 local _M = {}
 local assert = assert
 local _reload = false
+
+skynet.init(
+	function()
+	end
+)
 
 local function init_data(obj)
 	local uid = obj.uid
@@ -29,15 +31,25 @@ local function init_data(obj)
 	return servicecode.SUCCESS
 end
 
-skynet.init(
-	function()
+local function save_data(obj)
+	local data = {}
+	local ok, err = xpcall(AgentSystems.on_data_save, traceback, obj, data)
+	if ok then
+		if table.length(data) > 0 then
+			dbc.write_user(data)
+		else
+			log.error("uid(%d) not data", obj.uid)
+		end
+	else
+		log.error(err)
 	end
-)
+end
 
 function _M.start()
 end
 
 function _M.init_data()
+	-- 初始化agent服务的公共数据
 end
 
 function _M.sayhi(reload)
@@ -57,17 +69,7 @@ function _M.save_data()
 	objmgr.foreach(
 		function(obj)
 			if obj.authed then
-				local data = {}
-				local ok, err = xpcall(AgentSystems.on_data_save, traceback, obj, data)
-				if ok then
-					if table.length(data) > 0 then
-						dbc.write_user(data)
-					else
-						log.error("uid(%d) not data", obj.uid)
-					end
-				else
-					log.error(err)
-				end
+				save_data(obj)
 			end
 		end
 	)
@@ -95,7 +97,6 @@ function _M.login(gate, uid, subid, secret)
 		objmgr.add(obj)
 		-- TODO:
 		init_data(obj)
-		savedata.subscribe()
 	end
 	return servicecode.SUCCESS
 end
@@ -105,7 +106,7 @@ function _M.logout(uid)
 	local obj = objmgr.get(uid)
 	assert(obj.logined)
 	assert(obj.authed)
-	save_data(uid)
+	save_data(obj)
 
 	-- 断线重连
 	if false then
@@ -186,7 +187,27 @@ function _M.modify_name(fd, args)
 	return res
 end
 
-function _M.rank_power(fd, args)
+function _M.user_info(fd, args)
+	local obj = objmgr.get_by_fd(fd)
+	local res = {}
+	res.info = {
+		num = 0,
+		nickname = obj.mod_user.nickname,
+		nameid = "",
+		rcard = 0,
+		level = obj.mod_user.level
+	}
+	return res
+end
+
+function _M.fetch_rank_power(fd, args)
+	local addr = skynet.call(".ZSET_MGR", "lua", "get", "power")
+	local reply = skynet.call(addr, "lua", "range", 1, 2000)
+	skynet.error(table_dump(reply))
+	local res = {}
+	res.errorcode = 1
+	res.list = {}
+	return res
 end
 
 function _M.fetch_store_items(fd, args)

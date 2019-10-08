@@ -37,6 +37,7 @@ skynet.start(
 		lifemgr.uniqueservice("chestnut/friend_mgr")
 		lifemgr.uniqueservice("chestnut/zset_mgr")
 		lifemgr.uniqueservice("chestnut/room_mgr")
+		lifemgr.uniqueservice("chestnut/store")
 
 		local loginType = skynet.getenv "login_type"
 		if loginType == "so" then

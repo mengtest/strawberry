@@ -20,7 +20,6 @@ function SUB.save_data()
 end
 
 function CMD.start(name)
-	-- body
 	ldname = name
 	savedata.init {
 		command = SUB
@@ -32,10 +31,10 @@ end
 function CMD.init_data()
 	set = zset.new()
 	local res = db.read_zset(ldname)
-	-- skynet.error(table_dump(res))
-	for _, r in pairs(res.db_zset) do
-		set:add(r.power, {uid = r.uid})
-	end
+	skynet.error(table_dump(res))
+	-- for _, r in pairs(res.db_zset) do
+	-- 	set:add(r.power, {uid = r.uid})
+	-- end
 	return true
 end
 
@@ -54,7 +53,6 @@ end
 
 -- 访问数据
 function CMD.login(uid, agent, key, ...)
-	-- body
 	local u = users[uid]
 	if u then
 		u.agent = agent
@@ -66,36 +64,32 @@ function CMD.login(uid, agent, key, ...)
 			key = key
 		}
 		users[uid] = u
-		ld:push(u)
+		set:push(u)
 	end
 end
 
 function CMD.push(uid, key)
-	-- body
 	local u = users[uid]
 	if u then
 		u.key = key
 	else
 		assert(false)
 	end
-	ld:sort()
-	return ld:bsearch(u)
+	set:sort()
+	return set:bsearch(u)
 end
 
 function CMD.bsearch(uid, ...)
-	-- body
 	local u = users[uid]
-	return ld:bsearch(u)
+	return set:bsearch(u)
 end
 
 function CMD.range(start, stop)
-	-- body
-	return ld:range(start, stop)
+	return set:range(start, stop)
 end
 
 function CMD.nearby(rank)
-	-- body
-	return ld:nearby(rank)
+	return set:nearby(rank)
 end
 
 service.init {

@@ -6,7 +6,7 @@ local pcall = pcall
 local assert = assert
 local REQUEST = client.request()
 require "chestnut.achievement.request"
-require "chestnut.bag.requset"
+require "chestnut.bag.request"
 require "chestnut.chat.request"
 require "chestnut.checkin.request"
 require "chestnut.friend.request"
@@ -34,8 +34,12 @@ function REQUEST.modify_name(fd, args)
 	return context.modify_name(fd, args)
 end
 
-function REQUEST.rank_power(fd, args)
-	return context.rank_power(fd, args)
+function REQUEST.user_info(fd, args)
+	return context.user_info(fd, args)
+end
+
+function REQUEST.fetch_rank_power(fd, args)
+	return context.fetch_rank_power(fd, args)
 end
 
 function REQUEST.fetch_store_items(fd, args)

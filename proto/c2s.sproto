@@ -51,10 +51,39 @@
     level 1 : integer
 }
 
+.rank_power_item {
+    id 0 : integer
+    uid 1 : integer
+    power 2 : integer
+}
+
+.taskdaily {
+    id 0 : integer
+    finished 1 : integer
+}
+
+.base_info {
+    num      0 : integer
+    nickname 1 : string
+    nameid 2 : string
+    rcard 3 : integer
+    level 4 : integer
+}
+
+.team {
+    id 0 : integer
+    name 1 : string
+}
+
+.store_item {
+    id 0 : integer
+}
+
 .op {
 	session 0 : integer
     opcode 1 : integer
 }
+
 ####################################### 
 # 一般模块 [1, 100)
 handshake 1 {
@@ -77,12 +106,29 @@ enter 3 {
 
 
 ####################################### 
-# 系统模块 [100, 200)
+# 系统模块 [100, 150)
 # 第一条消息，主要是一个写个人信息
 modify_name 100 {
     request {
         nickname  0 : string
     }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+user_info 101 {
+    request {
+        uid 0 : integer
+    }
+    response {
+        info 0 : base_info
+    }
+}
+
+####################################### 
+# 背包模块 [150, 200)
+fetch_items 150 {
     response {
         errorcode 0 : integer
     }
@@ -101,6 +147,19 @@ say 200 {
 }
 
 ####################################### 
+# 房间模块 [250, 300)
+fetch_room_info 250 {
+    response {
+        errorcode 0 : integer
+        isCreated 1 : boolean
+        joined    2 : boolean
+        roomid    3 : integer
+        type      4 : integer    # 此房间的类型
+        mode      5 : integer    # 此房间的模式
+    }
+}
+
+####################################### 
 # 邮件模块 [300, 350)
 fetchinbox 300 {
     request {
@@ -109,16 +168,6 @@ fetchinbox 300 {
     response {
         errorcode 0 : integer
         list      1 : *mail
-    }
-}
-
-syncsysmail 301 {
-    request {
-        all       0 : *integer
-    }
-    response {
-        errorcode 0 : integer
-        inbox     1 : *mail
     }
 }
 
@@ -131,9 +180,18 @@ viewedmail 302 {
     }
 }
 
+viewedmail_all 303 {
+    request {
+        mailid    0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
 ####################################### 
-# 签到模块 [350, 400)
-checkindaily 350 {
+# 每日签到模块 [350, 400)
+fetch_checkins 350 {
     response {
         errorcode 0 : integer
     }
@@ -141,7 +199,7 @@ checkindaily 350 {
 
 ####################################### 
 # 记录模块 [400, 450)
-record 400 {
+fetch_records 400 {
     request {
         id 0 : integer
     }
@@ -155,13 +213,206 @@ record 400 {
 # 成就模块 [450, 500)
 active_achievement 450 {
     request {
+        id 0 : integer
+    }
+}
+
+fetch_achievements 451 {
+    response {
+        errorcode 0 : integer
+    }
+}
+
+#######################################
+# 功能模块 [500, 550)
+fetch_funcs 500 {
+    response {
+        errorcode 0 : integer
     }
 }
 
 ####################################### 
-# 记录模块 [450, 500)
+# 英雄模块 [550, 600)
+fetch_heros 550 {
+    response {
+        errorcode 0 : integer
+        list 1 : *hero
+    }
+}
+
+fetch_hero 551 {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+        hero 1 : hero
+    }
+}
+
 ####################################### 
-# 球球模块 [10000, 10100)
+# 好友模块 [600, 650)
+fetch_friend 600 {
+    request {
+        friend_uid 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+rm_friend 601 {
+    request {
+        friend_uid 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+add_friend_req 602 {
+    request {
+        friend_uid 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+fetch_friends 604 {
+    response {
+        errorcode 0 : integer
+    }
+}
+
+fetch_friend_reqs 605 {
+    response {
+        errorcode 0 : integer
+    }
+}
+
+acc_friend_req 606 {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+rej_friend_req 607 {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+acc_friend_req_all 608 {
+    response {
+        errorcode 0 : integer
+    }
+}
+
+rej_friend_req_all 609 {
+    response {
+        errorcode 0 : integer
+    }
+}
+
+####################################### 
+# 排行榜模块 [650, 700)
+fetch_rank_power 650 {
+    request {
+    }
+    response {
+        errorcode 0 : integer
+        list 1 : *rank_power_item
+    }
+}
+
+fetch_rank_team 651 {
+}
+
+####################################### 
+# 每日任务模块 [700, 750)
+fetch_dailytasks 700 {
+    response {
+        errorcode 0 : integer
+        tasks 1 : *taskdaily
+    }
+}
+
+
+####################################### 
+# 战队模块 [750, 800)
+fetch_teams 750 {
+    response {
+        errorcode 0 : integer
+        teams 1 : *team
+    }
+}
+
+fetch_team 751 {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+        team 1 : team
+    }
+}
+
+create_team 752 {
+    request {
+        fake 0 : team
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+join_team 753 {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+####################################### 
+# 商店模块 [800, 850)
+
+fetch_store_items 800 {
+    response {
+        errorcode 0 : integer
+        items 1 : *store_item
+    }
+}
+
+fetch_store_item 801 {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+        item 1 : store_item
+    }
+}
+
+buy_store_item 802 {
+    request {
+        id 0 : integer
+    }
+    response {
+        errorcode 0 : integer
+    }
+}
+
+####################################### 
+# 球球模块 [10000, 20000)
 opcode 10000 {
     request {
         opcode 0 : op

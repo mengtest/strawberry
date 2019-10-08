@@ -43,8 +43,8 @@ ballfd:close()
 ballc2sfd:close()
 balls2cfd:close()
 
-local c2s = base .. "\n\r" .. ball .. "\n\r" .. basec2s .. "\n\r" .. ballc2s
-local s2c = base .. "\n\r" .. ball .. "\n\r" .. bases2c .. "\n\r" .. balls2c
+local c2s = base .. "\n" .. ball .. "\n" .. basec2s .. "\n" .. ballc2s
+local s2c = base .. "\n" .. ball .. "\n" .. bases2c .. "\n" .. balls2c
 
 local c2sfd = io.open("c2s.sproto", "w+")
 local s2cfd = io.open("s2c.sproto", "w+")

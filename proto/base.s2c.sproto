@@ -201,7 +201,7 @@ add_hero 551 {
         id 0 : integer
     }
     response {
-        errorcode 0 : itne
+        errorcode 0 : integer
     }
 }
 

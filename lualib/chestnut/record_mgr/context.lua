@@ -23,29 +23,26 @@ local function send_records(obj)
 	self.context:send_request("records", args)
 end
 
-function _M.on_data_init(self, dbData)
+function _M.init_data()
 end
 
-function _M.on_data_save(self, dbData)
+function _M.save_data()
 end
 
-function _M.on_enter(self)
+function _M.enter(self)
 	send_records(self)
 end
 
 function _M:send_record(...)
-	-- body
 end
 
-function _M:add(item, ...)
-	-- body
+function _M.add(item, ...)
 	table.insert(self._data, mail)
 	self._count = self._count + 1
 	self._mk[item.id.value] = item
 end
 
 function _M:create(recordid, names, ...)
-	-- body
 	local r = record.new(self._env, self._dbctx, self)
 	r.id.value = recordid
 	r.uid = self._env._suid
@@ -58,14 +55,12 @@ function _M:create(recordid, names, ...)
 end
 
 function _M:add(mail, ...)
-	-- body
 	table.insert(self._data, mail)
 	self._count = self._count + 1
 	self._mk[mail.mailid.value] = mail
 end
 
-function _M:records(args, ...)
-	-- body
+function _M.fetch_records(args, ...)
 	local res = {}
 	res.errorcode = errorcode.SUCCESS
 	res.records = {}
@@ -82,8 +77,10 @@ function _M:records(args, ...)
 	return res
 end
 
+function _M.fetch_record(uid, id)
+end
+
 function _M:record(recordid, names, ...)
-	-- body
 	local i = record.new(self._env, self._dbctx, self)
 	i.uid.value = self._env._suid
 	i.recordid = recordid

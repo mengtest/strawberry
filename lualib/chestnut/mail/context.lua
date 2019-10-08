@@ -2,11 +2,8 @@ local skynet = require "skynet"
 local sd = require "skynet.sharetable"
 local snowflake = require "chestnut.snowflake"
 local log = require "chestnut.skynet.log"
-local zset = require "chestnut.zset"
-local sysmaild = require "sysmaild"
+local zset = require "zset"
 local client = require "client"
-require "request"
-require "response"
 
 local _M = {}
 

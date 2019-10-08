@@ -1,28 +1,31 @@
 local skynet = require "skynet"
 local savedata = require "savedata"
 local context = require "chestnut.store.context"
-local dbc = require "db"
 local CMD = require "cmd"
+local SUB = {}
+
+function SUB.save_data()
+    context.save_data()
+end
 
 function CMD.start()
-    -- savedata.init {}
-    -- savedata.subscribe()
+    savedata.init {
+        command = SUB
+    }
+    savedata.subscribe()
     return true
 end
 
 function CMD.init_data()
-    -- context.on_data_init(db_data)
-    return true
+    return context.init_data()
 end
 
 function CMD.sayhi()
     return true
 end
 
-function CMD.save_data()
-end
-
 function CMD.close()
+    context.save_data()
     return true
 end
 

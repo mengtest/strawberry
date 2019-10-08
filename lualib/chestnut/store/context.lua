@@ -2,6 +2,7 @@ local skynet = require "skynet"
 local sd = require "skynet.sharetable"
 local objmgr = require "objmgr"
 local servicecode = require "enum.servicecode"
+local dbc = require "db.db"
 local _M = {}
 local shop_cfg
 local table_insert = table.insert
@@ -12,10 +13,11 @@ skynet.init(
     end
 )
 
-function _M.init_data(dbData)
+function _M.init_data()
+    return true
 end
 
-function _M.save_data(dbData)
+function _M.save_data()
 end
 
 function _M.on_enter(self)

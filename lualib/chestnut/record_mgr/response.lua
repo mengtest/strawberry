@@ -1,5 +1,4 @@
 local skynet = require "skynet"
-local client = require "client"
-local RESPONSE = client.response()
+local RESPONSE = require "response"
 
 return RESPONSE

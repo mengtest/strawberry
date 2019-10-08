@@ -46,7 +46,7 @@ function CMD.close()
 	for _, v in pairs(handles) do
 		skynet.call(v, "lua", "close")
 	end
-	save_data()
+	-- save_data()
 	return true
 end
 

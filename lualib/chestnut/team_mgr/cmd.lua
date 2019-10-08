@@ -1,74 +1,42 @@
 local skynet = require "skynet"
 local savedata = require "savedata"
-local command = require "command"
+local context = require "chestnut.team_mgr.context"
 local CMD = require "cmd"
+local SUB = {}
 
--- function CMD:start()
--- 	savedata.init {}
--- 	savedata.subscribe()
--- 	return true
--- end
-
--- function CMD:init_data()
--- 	return true
--- end
-
--- function CMD:sayhi(...)
--- 	return true
--- end
-
--- function CMD:save_data()
--- end
-
--- function CMD:close(...)
--- 	return true
--- end
-
--- function CMD:kill(...)
--- 	skynet.exit()
--- end
-
-------------------------------------------
--- 房间协议
-function CMD:create(uid, mode, args, ...)
-	-- body
-	return self:create(uid, args, ...)
+function SUB.save_data()
+	context.save_data()
 end
 
-function CMD:on_join(agent, ...)
-	-- body
-	return self:join(agent.uid, agent.agent, agent.name, agent.sex, agent.secret)
+function CMD.start()
+	savedata.init {
+		command = SUB
+	}
+	savedata.subscribe()
+	return true
 end
 
-function CMD:on_rejoin(args)
-	-- body
-	return self:rejoin(args.uid, args.agent)
+function CMD.init_data()
+	return context.init_data()
 end
 
-function CMD:on_afk(uid)
-	-- body
-	return self:afk(uid)
+function CMD.sayhi()
+	return true
 end
 
-function CMD:on_leave(uid)
-	-- body
-	return self:leave(uid)
+function CMD.close()
+	context.save_data()
+	return true
+end
+
+function CMD.kill()
+	skynet.exit()
 end
 
 ------------------------------------------
--- gameplay 协议
-function CMD:query(session)
-	return self:query(session)
-end
-
-function CMD:born(session, ...)
-	-- body
-	return self:born(session, ...)
-end
-
-function CMD:opcode(session, args, ...)
-	-- body
-	return self:opcode(session, args, ...)
+-- gameplay协议
+function CMD.fetch_teams(uid, args)
+	return context.fetch_teams(uid, args)
 end
 
 return CMD

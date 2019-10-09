@@ -39,4 +39,24 @@ function CMD.fetch_teams(uid, args)
 	return context.fetch_teams(uid, args)
 end
 
+function CMD.fetch_team(uid, args)
+	return context.fetch_team(uid, args)
+end
+
+function CMD.create_team(uid, args)
+	return context.create_team(uid, args)
+end
+
+function CMD.join_team(uid, args)
+	return context.join_team(uid, args)
+end
+
+function CMD.fetch_myteams(uid, args)
+	return context.fetch_myteams(uid, args)
+end
+
+function CMD.quit_team(uid, args)
+	return context.quit_team(uid, args)
+end
+
 return CMD

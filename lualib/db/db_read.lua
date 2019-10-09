@@ -90,6 +90,18 @@ function _M:read_zset(tname)
 	end
 end
 
+function _M:read_team()
+	local res = self.db:query(string_format("CALL sp_teams_select();"))
+	if res.errno then
+		log.error("%s", self.dump(res))
+		return {}
+	end
+	if res.multiresultset then
+		return res[1]
+	end
+	return res
+end
+
 ------------------------------------------
 -- about user
 function _M:read_users_by_uid(uid)

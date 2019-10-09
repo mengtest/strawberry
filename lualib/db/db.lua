@@ -81,6 +81,12 @@ function QUERY.read_zset(tname)
 	return res
 end
 
+function QUERY.read_team()
+	local res = {}
+	res.db_teams = db_read.read_zset(ctx, tname)
+	return res
+end
+
 ------------------------------------------
 -- 写数据
 function QUERY.write_account(db_account)
@@ -118,6 +124,10 @@ end
 
 function QUERY.write_zset(tname, data)
 	db_write.write_zset(ctx, tname, data)
+end
+
+function QUERY.write_team(data)
+	db_write.write_team(ctx, data)
 end
 
 ------------------------------------------
@@ -162,6 +172,13 @@ function _M.read_zset(tname)
 	return skynet.call(handle, "lua", "read_zset", tname)
 end
 
+function _M.read_team()
+	local handle = get_address()
+	return skynet.call(handle, "lua", "read_team")
+end
+
+------------------------------------------
+-- 写数据
 function _M.write_account(account)
 	local handle = get_address()
 	skynet.send(handle, "lua", "write_account", account)
@@ -180,6 +197,11 @@ end
 function _M.write_zset(tname, data)
 	local handle = get_address()
 	skynet.send(handle, "lua", "write_zset", tname, data)
+end
+
+function _M.write_team()
+	local handle = get_address()
+	return skynet.call(handle, "lua", "write_team")
 end
 
 return _M

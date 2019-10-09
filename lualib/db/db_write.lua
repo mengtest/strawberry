@@ -3,7 +3,6 @@ local string_format = string.format
 local _M = {}
 
 function _M:write_room_mgr_users(db_users)
-	-- body
 	for _, db_user in pairs(db_users) do
 		local sql = string_format([==[CALL
 		sp_room_mgr_users_insert_or_update(%d, %d);]==], db_user.uid, db_user.roomid)
@@ -18,7 +17,6 @@ function _M:write_room_mgr_users(db_users)
 end
 
 function _M:write_room_mgr_rooms(db_rooms)
-	-- body
 	for _, db_room in pairs(db_rooms) do
 		local sql =
 			string_format(
@@ -41,7 +39,6 @@ function _M:write_room_mgr_rooms(db_rooms)
 end
 
 function _M:write_room_users(db_users)
-	-- body
 	for _, db_user in pairs(db_users) do
 		local sql =
 			string_format(
@@ -97,6 +94,28 @@ function _M:write_zset(tname, data)
 	end
 end
 
+function _M:write_team(data)
+	for _, it in pairs(data) do
+		local sql =
+			string_format(
+			[==[CALL
+		sp_teams_insert_or_update(%d, '%s', '%s', %d, %d, '%s', '%s');]==],
+			it.id,
+			it.name,
+			it.simple,
+			it.power,
+			it.join_tp,
+			it.join_cond,
+			it.members
+		)
+		local res = self.db:query(sql)
+		if res.errno then
+			log.error(sql)
+			log.error("%s", self.dump(res))
+		end
+	end
+end
+
 ------------------------------------------
 -- about user
 function _M:write_account(db_account)
@@ -142,7 +161,6 @@ function _M:write_user(db_user)
 end
 
 function _M:write_user_room(db_user_room)
-	-- body
 	if not db_user_room then
 		return
 	end
@@ -194,10 +212,12 @@ function _M:write_user_funcopen(db_user_funcopens)
 		local sql =
 			string_format(
 			[==[CALL
-			sp_user_funcopen_insert_or_update(%d, %d, %d);]==],
+			sp_user_funcopen_insert_or_update(%d, %d, %d, %d, %d);]==],
 			db_user_funcitem.uid,
 			db_user_funcitem.id,
-			db_user_funcitem.open
+			db_user_funcitem.open,
+			os.time(),
+			os.time()
 		)
 		-- log.info(sql)
 		local res = self.db:query(sql)
@@ -288,7 +308,6 @@ end
 ------------------------------------------
 -- 离线用户数据
 function _M:write_offuser_room_created(db_user_room)
-	-- body
 	local sql =
 		string_format(
 		[==[CALL
